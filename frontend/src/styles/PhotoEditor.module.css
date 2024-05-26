@@ -1,9 +1,9 @@
 .photoEditorContainer {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    width: 100%;
 }
 
 .imageInput {
@@ -27,8 +27,7 @@
     display: none;
 }
 
-.imagePreview {
-    max-width: 100%;
-    height: auto;
-    margin-top: 20px;
+.canvasContainer {
+    width: 100%;
+    height: 100%;
 }
