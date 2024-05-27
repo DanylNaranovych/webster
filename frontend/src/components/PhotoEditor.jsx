@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 import styles from '../styles/PhotoEditor.module.css';
 
@@ -14,6 +15,22 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
     const transformerRef = useRef(null);
     const imageRef = useRef(null);
     const stageRef = useRef(null);
+
+    const onDrop = useCallback((acceptedFiles) => {
+        const file = acceptedFiles[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImageSrc(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }, []);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            'image/*': ['.jpeg', '.jpg', '.png'],
+        },
+    });
 
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
@@ -93,18 +110,21 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
 
     return (
         <div ref={containerRef} className={styles.photoEditor}>
-            {!imageSrc && (
-                <label htmlFor="imageInput" className={styles.imageInput}>
-                    Choose Image
-                    <input
-                        id="imageInput"
-                        type="file"
-                        ref={fileInputRef}
-                        className="d-none"
-                        onChange={handleImageUpload}
-                    />
-                </label>
-            )}
+            <div {...getRootProps()} className={styles.dropzone}>
+                <input {...getInputProps()} />
+                {!imageSrc && (
+                    <label htmlFor="imageInput" className={styles.imageInput}>
+                        {isDragActive ? 'Drop the image here...' : 'Choose or Drag & Drop Image'}
+                        <input
+                            id="imageInput"
+                            type="file"
+                            ref={fileInputRef}
+                            className="d-none"
+                            onChange={handleImageUpload}
+                        />
+                    </label>
+                )}
+            </div>
             <div className={styles.stageContainer}>
                 <Stage
                     width={stageSize.width}
