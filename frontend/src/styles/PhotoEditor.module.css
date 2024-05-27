@@ -1,22 +1,23 @@
 .photoEditorContainer {
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .imageInput {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 2px dashed #007bff;
     border-radius: 8px;
-    width: 500px;
-    height: 500px;
+    margin-top: 1%;
+    width: 100%;
+    height: 90vh;
     cursor: pointer;
     font-size: 1.2rem;
     color: #007bff;
+    transition: background-color 0.3s ease;
 }
 
 .imageInput:hover {
@@ -24,10 +25,17 @@
 }
 
 .imageInput input[type='file'] {
-    display: none;
-}
-
-.canvasContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    cursor: pointer;
+}
+
+.photoEditor {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
 }

@@ -4,9 +4,13 @@ import { Navbar, Nav, Container } from 'react-bootstrap';
 
 const Header = () => {
     return (
-        <Navbar bg="light" expand="lg">
+        <Navbar
+            bg="light"
+            expand="lg"
+            style={{ borderBottom: '1px solid #000000' }}
+        >
             <Container>
-                <Navbar.Brand href="#home">Your Logo</Navbar.Brand>
+                <Navbar.Brand href="#home">Webster</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">

@@ -6,35 +6,15 @@ import Sidebar from './Sidebar';
 import PhotoEditor from './PhotoEditor';
 
 const MainPage = () => {
-    const [imageSettings, setImageSettings] = useState({
-        brightness: 100,
-        contrast: 100,
-        saturation: 100,
-    });
+    const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+    const [scale, setScale] = useState(1);
 
-    const handleEdit = (action, value) => {
-        switch (action) {
-            case 'brightness':
-                setImageSettings((prevSettings) => ({
-                    ...prevSettings,
-                    brightness: value,
-                }));
-                break;
-            case 'contrast':
-                setImageSettings((prevSettings) => ({
-                    ...prevSettings,
-                    contrast: value,
-                }));
-                break;
-            case 'saturation':
-                setImageSettings((prevSettings) => ({
-                    ...prevSettings,
-                    saturation: value,
-                }));
-                break;
-            default:
-                break;
-        }
+    const handleImageSizeChange = (newSize) => {
+        setImageSize(newSize);
+    };
+
+    const handleScaleChange = (newScale) => {
+        setScale(newScale);
     };
 
     return (
@@ -44,12 +24,12 @@ const MainPage = () => {
                 <Row>
                     <Col xs={10}>
                         <PhotoEditor
-                            onEdit={handleEdit}
-                            imageSettings={imageSettings}
+                            onImageSizeChange={handleImageSizeChange}
+                            onScaleChange={handleScaleChange}
                         />
                     </Col>
-                    <Col xs={2} style={{ borderLeft: '1px solid #ccc' }}>
-                        <Sidebar onEdit={handleEdit} />
+                    <Col xs={2}>
+                        <Sidebar imageSize={imageSize} scale={scale} />
                     </Col>
                 </Row>
             </Container>

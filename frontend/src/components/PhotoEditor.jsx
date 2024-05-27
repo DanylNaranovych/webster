@@ -1,96 +1,167 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Container } from 'react-bootstrap';
-import { fabric } from 'fabric';
-
+import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 import styles from '../styles/PhotoEditor.module.css';
 
-const PhotoEditor = ({ imageSettings }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const canvasRef = useRef(null);
+const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
+    const [imageSrc, setImageSrc] = useState(null);
+    const fileInputRef = useRef(null);
     const containerRef = useRef(null);
-
-    useEffect(() => {
-        // Функция, которая будет вызываться после каждого рендера
-        // Проверяем, есть ли ссылка на контейнер, и если есть, выводим его размеры
-        if (containerRef.current) {
-            console.log(
-                containerRef.current.offsetWidth,
-                containerRef.current.offsetHeight,
-            );
-        }
-    });
+    const [image, setImage] = useState(null);
+    const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+    const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+    const [scale, setScale] = useState(1);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const transformerRef = useRef(null);
+    const imageRef = useRef(null);
+    const stageRef = useRef(null);
 
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
-        reader.onload = (e) => {
-            const imgData = e.target.result;
-            fabric.Image.fromURL(imgData, (img) => {
-                const canvas = new fabric.Canvas(canvasRef.current);
-                canvas.setDimensions({
-                    width: containerRef.current.offsetWidth,
-                    height: containerRef.current.offsetHeight,
-                });
-
-                canvas.clear();
-                const scaleFactor = Math.min(
-                    canvas.width / img.width,
-                    canvas.height / img.height,
-                );
-                img.set({
-                    scaleX: scaleFactor,
-                    scaleY: scaleFactor,
-                });
-                img.set({
-                    maxWidth: canvas.width,
-                    maxHeight: canvas.height,
-                });
-                img.set({
-                    top: (canvas.height - img.height * scaleFactor) / 2,
-                    left: (canvas.width - img.width * scaleFactor) / 2,
-                    selectable: false, // Предотвращаем выбор изображения, чтобы пользователь не мог его передвигать
-                });
-                canvas.add(img);
-                canvas.renderAll();
-            });
+        reader.onload = () => {
+            setImageSrc(reader.result);
         };
-        setImageLoaded(true);
         reader.readAsDataURL(file);
     };
 
-    // const applyFilters = () => {
-    //     if (!canvas) return;
-    //     const { brightness, contrast, saturation } = imageSettings;
-    //     const filters = [];
-    //     filters.push(new fabric.Image.filters.Brightness({ brightness }));
-    //     filters.push(new fabric.Image.filters.Contrast({ contrast }));
-    //     filters.push(new fabric.Image.filters.Saturation({ saturation }));
-    //     canvas.getActiveObjects().forEach((obj) => {
-    //         obj.filters = filters;
-    //         obj.applyFilters();
-    //     });
-    //     canvas.renderAll();
-    // };
+    useEffect(() => {
+        onImageSizeChange(imageSize);
+        onScaleChange(scale);
+    }, [imageSize, scale, onImageSizeChange, onScaleChange]);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            const { clientWidth, clientHeight } = containerRef.current;
+            setStageSize({
+                width: clientWidth,
+                height: clientHeight,
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        if (imageSrc) {
+            const img = new window.Image();
+            img.src = imageSrc;
+            img.onload = () => {
+                setImage(img);
+                setImageSize({ width: img.width, height: img.height });
+                const initialScale = Math.min(
+                    stageSize.width / img.width,
+                    stageSize.height / img.height,
+                );
+                setScale(initialScale);
+            };
+        }
+    }, [imageSrc, stageSize]);
+
+    useEffect(() => {
+        if (selectedImage && transformerRef.current) {
+            transformerRef.current.nodes([imageRef.current]);
+            transformerRef.current.getLayer().batchDraw();
+        }
+    }, [selectedImage]);
+
+    const handleStageClick = (e) => {
+        if (e.target === e.target.getStage()) {
+            setSelectedImage(null);
+        }
+    };
+
+    const handleWheel = (e) => {
+        e.evt.preventDefault();
+        const stage = stageRef.current;
+        const oldScale = stage.scaleX();
+
+        const pointer = stage.getPointerPosition();
+
+        const mousePointTo = {
+            x: (pointer.x - stage.x()) / oldScale,
+            y: (pointer.y - stage.y()) / oldScale,
+        };
+
+        const newScale = e.evt.deltaY > 0 ? oldScale * 0.9 : oldScale * 1.1;
+        setScale(newScale);
+
+        const newPos = {
+            x: pointer.x - mousePointTo.x * newScale,
+            y: pointer.y - mousePointTo.y * newScale,
+        };
+        stage.position(newPos);
+        stage.batchDraw();
+    };
 
     return (
-        <Container
-            ref={containerRef}
-            className={`d-flex justify-content-center align-items-center ${styles.canvasContainer}`}
-        >
-            {imageLoaded ? null : (
+        <div ref={containerRef} className={styles.photoEditor}>
+            {!imageSrc && (
                 <label htmlFor="imageInput" className={styles.imageInput}>
                     Choose Image
                     <input
                         id="imageInput"
                         type="file"
-                        accept="image/*"
+                        ref={fileInputRef}
                         className="d-none"
                         onChange={handleImageUpload}
                     />
                 </label>
             )}
-            {imageLoaded && <canvas ref={canvasRef}></canvas>}
-        </Container>
+            <div className={styles.stageContainer}>
+                <Stage
+                    width={stageSize.width}
+                    height={stageSize.height}
+                    ref={stageRef}
+                    scaleX={scale}
+                    scaleY={scale}
+                    onWheel={handleWheel}
+                    onMouseDown={handleStageClick}
+                    onTouchStart={handleStageClick}
+                >
+                    <Layer>
+                        {image && (
+                            <KonvaImage
+                                image={image}
+                                width={imageSize.width}
+                                height={imageSize.height}
+                                ref={imageRef}
+                                onClick={() => setSelectedImage(image)}
+                                onTap={() => setSelectedImage(image)}
+                                onTransformEnd={(e) => {
+                                    const node = imageRef.current;
+                                    const scaleX = node.scaleX();
+                                    const scaleY = node.scaleY();
+                                    node.scaleX(1);
+                                    node.scaleY(1);
+                                    setImageSize({
+                                        width: Math.max(
+                                            20,
+                                            node.width() * scaleX,
+                                        ),
+                                        height: Math.max(
+                                            20,
+                                            node.height() * scaleY,
+                                        ),
+                                    });
+                                }}
+                            />
+                        )}
+                        {selectedImage && (
+                            <Transformer
+                                ref={transformerRef}
+                                boundBoxFunc={(oldBox, newBox) => {
+                                    if (
+                                        newBox.width < 20 ||
+                                        newBox.height < 20
+                                    ) {
+                                        return oldBox;
+                                    }
+                                    return newBox;
+                                }}
+                            />
+                        )}
+                    </Layer>
+                </Stage>
+            </div>
+        </div>
     );
 };
 
