@@ -1,7 +1,10 @@
 import React from 'react';
-import { Form, Nav, Badge, ProgressBar } from 'react-bootstrap';
+import { Form, Nav, Badge, ProgressBar, Button } from 'react-bootstrap';
 
-const Sidebar = ({ imageSize, scale, onScaleChange }) => {
+const Sidebar = ({ imageSize, scale, onScaleChange, onSaveImage }) => {
+    const handleSaveClick = () => {
+        onSaveImage();
+    };
     return (
         <Nav className="flex-column p-3 bg-light rounded">
             <Nav.Item>
@@ -68,6 +71,11 @@ const Sidebar = ({ imageSize, scale, onScaleChange }) => {
                         className="mt-2"
                     />
                 </div>
+            </Nav.Item>
+            <Nav.Item>
+                <Button variant="primary" onClick={handleSaveClick}>
+                    Save Image
+                </Button>
             </Nav.Item>
         </Nav>
     );

@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
+import { Stage, Layer, Image, Transformer } from 'react-konva';
 import styles from '../styles/PhotoEditor.module.css';
 
-const PhotoEditor = ({ onImageSizeChange, onScaleChange, scale }) => {
+const PhotoEditor = ({
+    onImageSizeChange,
+    onScaleChange,
+    scale,
+    onSaveImage,
+}) => {
     const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
     const [image, setImage] = useState(null);
@@ -55,8 +60,16 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange, scale }) => {
 
     useEffect(() => {
         onImageSizeChange(imageSize);
+        onSaveImage(image);
         onScaleChange(scale);
-    }, [imageSize, scale, onImageSizeChange, onScaleChange]);
+    }, [
+        imageSize,
+        scale,
+        image,
+        onSaveImage,
+        onImageSizeChange,
+        onScaleChange,
+    ]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -171,6 +184,7 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange, scale }) => {
             {imageSrc && (
                 <div className={styles.stageContainer}>
                     <Stage
+                        className={styles.stageContainer}
                         width={stageSize.width}
                         height={stageSize.height}
                         ref={stageRef}
@@ -187,7 +201,7 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange, scale }) => {
                     >
                         <Layer>
                             {image && (
-                                <KonvaImage
+                                <Image
                                     image={image}
                                     width={imageSize.width}
                                     height={imageSize.height}
