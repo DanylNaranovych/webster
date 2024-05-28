@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import styles from '../styles/MainPage.module.css';
 
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -22,14 +23,19 @@ const MainPage = () => {
             <Header />
             <Container fluid>
                 <Row>
-                    <Col xs={10}>
+                    <Col xs={10} className={styles.col}>
                         <PhotoEditor
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
+                            scale={scale}
                         />
                     </Col>
-                    <Col xs={2}>
-                        <Sidebar imageSize={imageSize} scale={scale} />
+                    <Col xs={2} className={styles.col}>
+                        <Sidebar
+                            imageSize={imageSize}
+                            scale={scale}
+                            onScaleChange={handleScaleChange}
+                        />
                     </Col>
                 </Row>
             </Container>

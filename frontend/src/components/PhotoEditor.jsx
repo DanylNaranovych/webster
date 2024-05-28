@@ -3,13 +3,12 @@ import { useDropzone } from 'react-dropzone';
 import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
 import styles from '../styles/PhotoEditor.module.css';
 
-const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
+const PhotoEditor = ({ onImageSizeChange, onScaleChange, scale }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
     const [image, setImage] = useState(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
-    const [scale, setScale] = useState(1);
     const [selectedImage, setSelectedImage] = useState(null);
     const transformerRef = useRef(null);
     const imageRef = useRef(null);
@@ -76,11 +75,6 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
             img.onload = () => {
                 setImage(img);
                 setImageSize({ width: img.width, height: img.height });
-                const initialScale = Math.min(
-                    stageSize.width / img.width,
-                    stageSize.height / img.height,
-                );
-                setScale(initialScale);
             };
         }
     }, [imageSrc, stageSize]);
@@ -104,8 +98,9 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
             y: (pointer.y - stage.y()) / oldScale,
         };
 
-        const newScale = e.evt.deltaY > 0 ? oldScale * 0.9 : oldScale * 1.1;
-        setScale(newScale);
+        let newScale = e.evt.deltaY > 0 ? oldScale * 0.9 : oldScale * 1.1;
+        newScale = Math.max(0.125, Math.min(8, newScale));
+        onScaleChange(newScale);
 
         const newPos = {
             x: pointer.x - mousePointTo.x * newScale,
@@ -141,79 +136,101 @@ const PhotoEditor = ({ onImageSizeChange, onScaleChange }) => {
         setIsDragging(false);
     };
 
+    useEffect(() => {
+        const handleDeleteImage = () => {
+            setImageSrc(null);
+            setImage(null);
+            setSelectedImage(null);
+            setImageSize({ width: 0, height: 0 });
+            onScaleChange(1);
+        };
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Delete' && selectedImage) {
+                handleDeleteImage();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedImage, onScaleChange]);
+
     return (
         <div ref={containerRef} className={styles.photoEditor}>
             {!imageSrc && (
-                <div {...getRootProps()} className={styles.dropzone}>
+                <div {...getRootProps()} className={styles.imageInput}>
+                    {isDragActive
+                        ? 'Drop the image here...'
+                        : 'Choose or Drag & Drop Image'}
                     <input {...getInputProps()} />
-                    <label htmlFor="imageInput" className={styles.imageInput}>
-                        {isDragActive
-                            ? 'Drop the image here...'
-                            : 'Choose or Drag & Drop Image'}
-                    </label>
                 </div>
             )}
-            <div className={styles.stageContainer}>
-                <Stage
-                    width={stageSize.width}
-                    height={stageSize.height}
-                    ref={stageRef}
-                    scaleX={scale}
-                    scaleY={scale}
-                    onWheel={handleWheel}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                    onTouchStart={handleMouseDown}
-                    onTouchMove={handleMouseMove}
-                    onTouchEnd={handleMouseUp}
-                >
-                    <Layer>
-                        {image && (
-                            <KonvaImage
-                                image={image}
-                                width={imageSize.width}
-                                height={imageSize.height}
-                                ref={imageRef}
-                                onClick={() => setSelectedImage(image)}
-                                onTap={() => setSelectedImage(image)}
-                                onTransformEnd={(e) => {
-                                    const node = imageRef.current;
-                                    const scaleX = node.scaleX();
-                                    const scaleY = node.scaleY();
-                                    node.scaleX(1);
-                                    node.scaleY(1);
-                                    setImageSize({
-                                        width: Math.max(
-                                            20,
-                                            node.width() * scaleX,
-                                        ),
-                                        height: Math.max(
-                                            20,
-                                            node.height() * scaleY,
-                                        ),
-                                    });
-                                }}
-                            />
-                        )}
-                        {selectedImage && (
-                            <Transformer
-                                ref={transformerRef}
-                                boundBoxFunc={(oldBox, newBox) => {
-                                    if (
-                                        newBox.width < 20 ||
-                                        newBox.height < 20
-                                    ) {
-                                        return oldBox;
-                                    }
-                                    return newBox;
-                                }}
-                            />
-                        )}
-                    </Layer>
-                </Stage>
-            </div>
+            {imageSrc && (
+                <div className={styles.stageContainer}>
+                    <Stage
+                        width={stageSize.width}
+                        height={stageSize.height}
+                        ref={stageRef}
+                        scaleX={scale}
+                        scaleY={scale}
+                        onWheel={handleWheel}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        onTouchStart={handleMouseDown}
+                        onTouchMove={handleMouseMove}
+                        onTouchEnd={handleMouseUp}
+                    >
+                        <Layer>
+                            {image && (
+                                <KonvaImage
+                                    image={image}
+                                    width={imageSize.width}
+                                    height={imageSize.height}
+                                    ref={imageRef}
+                                    onClick={() => setSelectedImage(image)}
+                                    onTap={() => setSelectedImage(image)}
+                                    onTransformEnd={(e) => {
+                                        const node = imageRef.current;
+                                        const scaleX = node.scaleX();
+                                        const scaleY = node.scaleY();
+                                        node.scaleX(1);
+                                        node.scaleY(1);
+                                        setImageSize({
+                                            width: Math.max(
+                                                20,
+                                                node.width() * scaleX,
+                                            ),
+                                            height: Math.max(
+                                                20,
+                                                node.height() * scaleY,
+                                            ),
+                                        });
+                                    }}
+                                />
+                            )}
+                            {selectedImage && (
+                                <Transformer
+                                    ref={transformerRef}
+                                    boundBoxFunc={(oldBox, newBox) => {
+                                        if (
+                                            newBox.width < 20 ||
+                                            newBox.height < 20
+                                        ) {
+                                            return oldBox;
+                                        }
+                                        return newBox;
+                                    }}
+                                />
+                            )}
+                        </Layer>
+                    </Stage>
+                </div>
+            )}
         </div>
     );
 };
