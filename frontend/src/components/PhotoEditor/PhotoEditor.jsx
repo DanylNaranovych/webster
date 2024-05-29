@@ -11,6 +11,7 @@ const PhotoEditor = ({
     onScaleChange,
     scale,
     onSaveImage,
+    onSaveLines,
     selectedTool,
 }) => {
     const [imageSrc, setImageSrc] = useState(null);
@@ -26,6 +27,7 @@ const PhotoEditor = ({
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lines, setLines] = useState([]);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [drawColor] = useState('black');
 
     const handleDeleteImage = () => {
         setImageSrc(null);
@@ -58,6 +60,7 @@ const PhotoEditor = ({
         onImageSizeChange(imageSize);
         onSaveImage(image);
         onScaleChange(scale);
+        onSaveLines(lines);
     }, [
         imageSize,
         scale,
@@ -65,6 +68,8 @@ const PhotoEditor = ({
         onSaveImage,
         onImageSizeChange,
         onScaleChange,
+        onSaveLines,
+        lines,
     ]);
 
     useEffect(() => {
@@ -121,8 +126,9 @@ const PhotoEditor = ({
     };
 
     const handleMouseDown = (e) => {
-        if (selectedTool === 'draw') {
+        if (selectedTool === 'draw' || selectedTool === 'erase') {
             setIsDrawing(true);
+            const color = selectedTool === 'erase' ? 'white' : drawColor;
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -134,7 +140,7 @@ const PhotoEditor = ({
                 y >= 0 &&
                 y <= imageSize.height
             ) {
-                setLines([...lines, { points: [x, y] }]);
+                setLines([...lines, { points: [x, y], color }]);
             }
             return;
         }
@@ -146,9 +152,13 @@ const PhotoEditor = ({
         const pointer = stage.getPointerPosition();
         setDragStart({ x: pointer.x - stage.x(), y: pointer.y - stage.y() });
     };
-
+    console.log(selectedTool);
     const handleMouseMove = (e) => {
-        if (isDrawing && selectedTool === 'draw') {
+        if (
+            isDrawing &&
+            (selectedTool === 'draw' || selectedTool === 'erase')
+        ) {
+            console.log('chec');
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -235,7 +245,7 @@ const PhotoEditor = ({
                             <Line
                                 key={i}
                                 points={line.points}
-                                stroke="black"
+                                stroke={line.color}
                                 strokeWidth={8}
                             />
                         ))}

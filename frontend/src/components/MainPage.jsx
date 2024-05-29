@@ -11,6 +11,7 @@ const MainPage = () => {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
     const [image, setImage] = useState(null);
+    const [lines, setLines] = useState([]);
     const [selectedTool, setSelectedTool] = useState('select');
 
     const handleImageSizeChange = (newSize) => {
@@ -38,7 +39,9 @@ const MainPage = () => {
             width: imageSize.width,
             height: imageSize.height,
         });
+
         const tempLayer = new Konva.Layer();
+
         const tempImage = new Konva.Image({
             image: image,
             width: imageSize.width,
@@ -46,6 +49,16 @@ const MainPage = () => {
         });
 
         tempLayer.add(tempImage);
+
+        lines.forEach((line) => {
+            const tempLine = new Konva.Line({
+                points: line.points,
+                stroke: line.color,
+                strokeWidth: 8,
+            });
+            tempLayer.add(tempLine);
+        });
+
         tempStage.add(tempLayer);
 
         const uri = tempStage.toDataURL();
@@ -73,6 +86,7 @@ const MainPage = () => {
                             scale={scale}
                             selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
+                            onSaveLines={setLines}
                         />
                     </Col>
                     <Col xs={2} className={styles.col}>
