@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Stage, Layer, Image, Transformer, Line } from 'react-konva';
-import styles from '../styles/PhotoEditor.module.css';
+import useImagePaste from './hooks/useImagePaste';
+import useDeleteImage from './hooks/useDeleteImage';
+import { handleTransformEnd } from '../../utils/transformUtils';
+import styles from '../../styles/PhotoEditor.module.css';
 
 const PhotoEditor = ({
     onImageSizeChange,
@@ -24,6 +27,17 @@ const PhotoEditor = ({
     const [lines, setLines] = useState([]);
     const [isDrawing, setIsDrawing] = useState(false);
 
+    const handleDeleteImage = () => {
+        setImageSrc(null);
+        setImage(null);
+        setSelectedImage(null);
+        setImageSize({ width: 0, height: 0 });
+        onScaleChange(1);
+    };
+
+    useImagePaste(setImageSrc);
+    useDeleteImage(selectedImage, handleDeleteImage);
+
     const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
         const reader = new FileReader();
@@ -39,27 +53,6 @@ const PhotoEditor = ({
             'image/*': ['.jpeg', '.jpg', '.png'],
         },
     });
-
-    const handlePaste = (event) => {
-        const items = event.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-                const file = items[i].getAsFile();
-                const reader = new FileReader();
-                reader.onload = () => {
-                    setImageSrc(reader.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    };
-
-    useEffect(() => {
-        window.addEventListener('paste', handlePaste);
-        return () => {
-            window.removeEventListener('paste', handlePaste);
-        };
-    }, []);
 
     useEffect(() => {
         onImageSizeChange(imageSize);
@@ -193,60 +186,6 @@ const PhotoEditor = ({
         setIsDrawing(false);
     };
 
-    useEffect(() => {
-        const handleDeleteImage = () => {
-            setImageSrc(null);
-            setImage(null);
-            setSelectedImage(null);
-            setImageSize({ width: 0, height: 0 });
-            onScaleChange(1);
-        };
-
-        const handleKeyDown = (event) => {
-            if (event.key === 'Delete' && selectedImage) {
-                handleDeleteImage();
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [selectedImage, onScaleChange]);
-
-    const handleTransformEnd = () => {
-        const node = imageRef.current;
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
-
-        const newWidth = Math.max(20, node.width() * scaleX);
-        const newHeight = Math.max(20, node.height() * scaleY);
-
-        node.scaleX(1);
-        node.scaleY(1);
-
-        setImageSize({
-            width: newWidth,
-            height: newHeight,
-        });
-
-        const updatedLines = lines.map((line) => {
-            const updatedPoints = line.points.map((point, index) => {
-                if (index % 2 === 0) {
-                    return point * scaleX;
-                } else {
-                    return point * scaleY;
-                }
-            });
-            return {
-                ...line,
-                points: updatedPoints,
-            };
-        });
-        setLines(updatedLines);
-    };
-
     return (
         <div ref={containerRef} className={styles.photoEditor}>
             {!imageSrc && (
@@ -282,7 +221,14 @@ const PhotoEditor = ({
                                 ref={imageRef}
                                 onClick={() => setSelectedImage(image)}
                                 onTap={() => setSelectedImage(image)}
-                                onTransformEnd={() => handleTransformEnd()}
+                                onTransformEnd={() =>
+                                    handleTransformEnd(
+                                        imageRef,
+                                        lines,
+                                        setLines,
+                                        setImageSize,
+                                    )
+                                }
                             />
                         )}
                         {lines.map((line, i) => (

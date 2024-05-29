@@ -5,7 +5,7 @@ import styles from '../styles/MainPage.module.css';
 
 import Header from './Header';
 import Sidebar from './Sidebar';
-import PhotoEditor from './PhotoEditor';
+import PhotoEditor from './PhotoEditor/PhotoEditor';
 
 const MainPage = () => {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
