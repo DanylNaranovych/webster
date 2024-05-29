@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Stage, Layer, Image, Transformer } from 'react-konva';
+import { Stage, Layer, Image, Transformer, Line } from 'react-konva';
 import styles from '../styles/PhotoEditor.module.css';
 
 const PhotoEditor = ({
@@ -8,6 +8,7 @@ const PhotoEditor = ({
     onScaleChange,
     scale,
     onSaveImage,
+    selectedTool,
 }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
@@ -20,6 +21,8 @@ const PhotoEditor = ({
     const stageRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+    const [lines, setLines] = useState([]);
+    const [isDrawing, setIsDrawing] = useState(false);
 
     const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
@@ -94,6 +97,7 @@ const PhotoEditor = ({
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {
+            console.log(transformerRef);
             transformerRef.current.nodes([imageRef.current]);
             transformerRef.current.getLayer().batchDraw();
         }
@@ -124,6 +128,23 @@ const PhotoEditor = ({
     };
 
     const handleMouseDown = (e) => {
+        if (selectedTool === 'draw') {
+            setIsDrawing(true);
+            const stage = stageRef.current;
+            const scale = stage.scaleX();
+            const pointerPosition = stage.getPointerPosition();
+            const x = (pointerPosition.x - stage.x()) / scale;
+            const y = (pointerPosition.y - stage.y()) / scale;
+            if (
+                x >= 0 &&
+                x <= imageSize.width &&
+                y >= 0 &&
+                y <= imageSize.height
+            ) {
+                setLines([...lines, { points: [x, y] }]);
+            }
+            return;
+        }
         if (e.target === e.target.getStage()) {
             setSelectedImage(null);
         }
@@ -134,6 +155,28 @@ const PhotoEditor = ({
     };
 
     const handleMouseMove = (e) => {
+        if (isDrawing && selectedTool === 'draw') {
+            const stage = stageRef.current;
+            const scale = stage.scaleX();
+            const pointerPosition = stage.getPointerPosition();
+            const x = (pointerPosition.x - stage.x()) / scale;
+            const y = (pointerPosition.y - stage.y()) / scale;
+            if (
+                x >= 0 &&
+                x <= imageSize.width &&
+                y >= 0 &&
+                y <= imageSize.height
+            ) {
+                const lastLine = lines[lines.length - 1];
+                const lastPoint = lastLine.points.slice(-2);
+                const distance = Math.hypot(x - lastPoint[0], y - lastPoint[1]);
+                if (distance > 2) {
+                    lastLine.points = lastLine.points.concat([x, y]);
+                    setLines([...lines.slice(0, lines.length - 1), lastLine]);
+                }
+            }
+            return;
+        }
         if (!isDragging) return;
         const stage = stageRef.current;
         const pointer = stage.getPointerPosition();
@@ -147,6 +190,7 @@ const PhotoEditor = ({
 
     const handleMouseUp = () => {
         setIsDragging(false);
+        setIsDrawing(false);
     };
 
     useEffect(() => {
@@ -171,6 +215,38 @@ const PhotoEditor = ({
         };
     }, [selectedImage, onScaleChange]);
 
+    const handleTransformEnd = () => {
+        const node = imageRef.current;
+        const scaleX = node.scaleX();
+        const scaleY = node.scaleY();
+
+        const newWidth = Math.max(20, node.width() * scaleX);
+        const newHeight = Math.max(20, node.height() * scaleY);
+
+        node.scaleX(1);
+        node.scaleY(1);
+
+        setImageSize({
+            width: newWidth,
+            height: newHeight,
+        });
+
+        const updatedLines = lines.map((line) => {
+            const updatedPoints = line.points.map((point, index) => {
+                if (index % 2 === 0) {
+                    return point * scaleX;
+                } else {
+                    return point * scaleY;
+                }
+            });
+            return {
+                ...line,
+                points: updatedPoints,
+            };
+        });
+        setLines(updatedLines);
+    };
+
     return (
         <div ref={containerRef} className={styles.photoEditor}>
             {!imageSrc && (
@@ -182,68 +258,83 @@ const PhotoEditor = ({
                 </div>
             )}
             {imageSrc && (
-                <div className={styles.stageContainer}>
-                    <Stage
-                        className={styles.stageContainer}
-                        width={stageSize.width}
-                        height={stageSize.height}
-                        ref={stageRef}
-                        scaleX={scale}
-                        scaleY={scale}
-                        onWheel={handleWheel}
-                        onMouseDown={handleMouseDown}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseUp}
-                        onMouseLeave={handleMouseUp}
-                        onTouchStart={handleMouseDown}
-                        onTouchMove={handleMouseMove}
-                        onTouchEnd={handleMouseUp}
-                    >
-                        <Layer>
-                            {image && (
-                                <Image
-                                    image={image}
-                                    width={imageSize.width}
-                                    height={imageSize.height}
-                                    ref={imageRef}
-                                    onClick={() => setSelectedImage(image)}
-                                    onTap={() => setSelectedImage(image)}
-                                    onTransformEnd={(e) => {
-                                        const node = imageRef.current;
-                                        const scaleX = node.scaleX();
-                                        const scaleY = node.scaleY();
-                                        node.scaleX(1);
-                                        node.scaleY(1);
-                                        setImageSize({
-                                            width: Math.max(
-                                                20,
-                                                node.width() * scaleX,
-                                            ),
-                                            height: Math.max(
-                                                20,
-                                                node.height() * scaleY,
-                                            ),
-                                        });
-                                    }}
-                                />
-                            )}
-                            {selectedImage && (
-                                <Transformer
-                                    ref={transformerRef}
-                                    boundBoxFunc={(oldBox, newBox) => {
-                                        if (
-                                            newBox.width < 20 ||
-                                            newBox.height < 20
-                                        ) {
-                                            return oldBox;
-                                        }
-                                        return newBox;
-                                    }}
-                                />
-                            )}
-                        </Layer>
-                    </Stage>
-                </div>
+                <Stage
+                    width={stageSize.width}
+                    height={stageSize.height}
+                    ref={stageRef}
+                    scaleX={scale}
+                    scaleY={scale}
+                    onWheel={handleWheel}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onTouchStart={handleMouseDown}
+                    onTouchMove={handleMouseMove}
+                    onTouchEnd={handleMouseUp}
+                >
+                    <Layer>
+                        {image && (
+                            <Image
+                                image={image}
+                                width={imageSize.width}
+                                height={imageSize.height}
+                                ref={imageRef}
+                                onClick={() => setSelectedImage(image)}
+                                onTap={() => setSelectedImage(image)}
+                                onTransformEnd={() => handleTransformEnd()}
+                            />
+                        )}
+                        {lines.map((line, i) => (
+                            <Line
+                                key={i}
+                                points={line.points}
+                                stroke="black"
+                                strokeWidth={8}
+                            />
+                        ))}
+                        {selectedImage && (
+                            <Transformer
+                                ref={transformerRef}
+                                boundBoxFunc={(oldBox, newBox) => {
+                                    const imageWidth =
+                                        imageRef.current.width() * scale;
+                                    const imageHeight =
+                                        imageRef.current.height() * scale;
+                                    const imageX = imageRef.current.x();
+                                    const imageY = imageRef.current.y();
+                                    if (
+                                        newBox.x < 0 ||
+                                        newBox.y < 0 ||
+                                        newBox.x + newBox.width >
+                                            stageSize.width ||
+                                        newBox.y + newBox.height >
+                                            stageSize.height
+                                    ) {
+                                        return oldBox;
+                                    }
+                                    const deltaX = newBox.x - oldBox.x;
+                                    const deltaY = newBox.y - oldBox.y;
+                                    if (
+                                        (deltaX !== 0 && deltaY !== 0) ||
+                                        (deltaX < 0 && imageX + deltaX < 0) ||
+                                        (deltaY < 0 && imageY + deltaY < 0) ||
+                                        (deltaX > 0 &&
+                                            imageX + imageWidth + deltaX >
+                                                stageSize.width) ||
+                                        (deltaY > 0 &&
+                                            imageY + imageHeight + deltaY >
+                                                stageSize.height)
+                                    ) {
+                                        return oldBox;
+                                    }
+
+                                    return newBox;
+                                }}
+                            />
+                        )}
+                    </Layer>
+                </Stage>
             )}
         </div>
     );

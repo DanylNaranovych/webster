@@ -11,6 +11,7 @@ const MainPage = () => {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
     const [image, setImage] = useState(null);
+    const [selectedTool, setSelectedTool] = useState('select');
 
     const handleImageSizeChange = (newSize) => {
         setImageSize(newSize);
@@ -22,6 +23,10 @@ const MainPage = () => {
 
     const handleSaveImage = (image) => {
         setImage(image);
+    };
+
+    const handleToolChange = (mode) => {
+        setSelectedTool(mode);
     };
 
     const handleSave = () => {
@@ -66,16 +71,21 @@ const MainPage = () => {
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
                             scale={scale}
+                            selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
                         />
                     </Col>
                     <Col xs={2} className={styles.col}>
-                        <Sidebar
-                            imageSize={imageSize}
-                            scale={scale}
-                            onScaleChange={handleScaleChange}
-                            onSaveImage={handleSave}
-                        />
+                        <div style={{ maxHeight: '100vh', overflowY: 'auto' }}>
+                            <Sidebar
+                                imageSize={imageSize}
+                                scale={scale}
+                                onScaleChange={handleScaleChange}
+                                onSaveImage={handleSave}
+                                onToolChange={handleToolChange}
+                                selectedTool={selectedTool}
+                            />
+                        </div>
                     </Col>
                 </Row>
             </Container>
