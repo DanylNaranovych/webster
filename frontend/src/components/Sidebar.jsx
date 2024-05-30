@@ -8,7 +8,7 @@ import {
     OverlayTrigger,
     Tooltip,
 } from 'react-bootstrap';
-import { SketchPicker } from 'react-color';
+import { SketchPicker, SwatchesPicker } from 'react-color';
 import {
     FaPaintBrush,
     FaEraser,
@@ -22,6 +22,7 @@ import {
 const Sidebar = ({
     imageSize,
     scale,
+    color,
     onScaleChange,
     onSaveImage,
     onToolChange,
@@ -30,15 +31,15 @@ const Sidebar = ({
     onBrushSizeChange,
     selectedTool,
 }) => {
-    const [color, setColor] = useState('#000');
     const [brushSize, setBrushSize] = useState(0);
+    const [localColor, setLocalColor] = useState(color);
 
     const handleSaveClick = () => {
         onSaveImage();
     };
 
     const handleColorChange = (color) => {
-        setColor(color.hex);
+        setLocalColor(color.hex);
         onColorChange(color.hex);
     };
 
@@ -52,40 +53,11 @@ const Sidebar = ({
     );
 
     return (
-        <Nav className="flex-column p-3 bg-light rounded">
+        <Nav className={`flex-column p-3 `}>
             <Nav.Item>
                 <h5 className="mb-4">Edit Options</h5>
             </Nav.Item>
-            <Nav.Item className="mb-3">
-                <Form.Label>Brightness</Form.Label>
-                <Form.Control
-                    type="range"
-                    min="0"
-                    max="200"
-                    defaultValue="100"
-                    className="custom-range"
-                />
-            </Nav.Item>
-            <Nav.Item className="mb-3">
-                <Form.Label>Contrast</Form.Label>
-                <Form.Control
-                    type="range"
-                    min="0"
-                    max="200"
-                    defaultValue="100"
-                    className="custom-range"
-                />
-            </Nav.Item>
-            <Nav.Item className="mb-3">
-                <Form.Label>Saturation</Form.Label>
-                <Form.Control
-                    type="range"
-                    min="0"
-                    max="200"
-                    defaultValue="100"
-                    className="custom-range"
-                />
-            </Nav.Item>
+
             <Nav.Item className="mb-3">
                 <Form.Label>Image Size</Form.Label>
                 <div>
@@ -280,18 +252,54 @@ const Sidebar = ({
                         </Button>
                     </OverlayTrigger>
                 </div>
+                <div
+                    className="d-flex align-items-center"
+                    style={{ position: 'relative' }}
+                >
+                    <input
+                        type="range"
+                        min="5"
+                        max="100"
+                        step="5"
+                        value={brushSize}
+                        onChange={(e) =>
+                            handleBrushSizeChange(parseInt(e.target.value))
+                        }
+                        style={{ marginRight: '10px' }}
+                    />
+                    <span
+                        style={{
+                            fontSize: `${brushSize + 6}px`,
+                            position: 'absolute',
+                            left: '130px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                        }}
+                    >
+                        ●
+                    </span>
+                </div>
             </Nav.Item>
-            <Nav.Item className="mb-3">
-                <Form.Label>Brush Color</Form.Label>
-                <SketchPicker
-                    color={color}
-                    onChangeComplete={handleColorChange}
-                />
-            </Nav.Item>
+
             <Nav.Item className="mb-3">
                 <Button variant="primary" onClick={handleSaveClick}>
                     Save Image
                 </Button>
+            </Nav.Item>
+            <Nav.Item className="mb-3">
+                <Form.Label>Brush Color</Form.Label>
+
+                <SketchPicker
+                    color={localColor}
+                    onChangeComplete={handleColorChange}
+                />
+            </Nav.Item>
+            <Nav.Item className="mb-3">
+                <Form.Label>Brush Color</Form.Label>
+                <SwatchesPicker
+                    color={localColor}
+                    onChangeComplete={handleColorChange}
+                />
             </Nav.Item>
         </Nav>
     );

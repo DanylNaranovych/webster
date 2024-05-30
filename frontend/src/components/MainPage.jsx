@@ -11,8 +11,10 @@ const MainPage = () => {
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
     const [image, setImage] = useState(null);
+    const [lineSize, setLineSize] = useState(2);
     const [lines, setLines] = useState([]);
     const [selectedTool, setSelectedTool] = useState('select');
+    const [color, setColor] = useState('#000');
 
     const handleImageSizeChange = (newSize) => {
         setImageSize(newSize);
@@ -20,6 +22,14 @@ const MainPage = () => {
 
     const handleScaleChange = (newScale) => {
         setScale(newScale);
+    };
+
+    const handleColorChange = (color) => {
+        setColor(color);
+    };
+
+    const handleLineSizeChange = (size) => {
+        setLineSize(size);
     };
 
     const handleSaveImage = (image) => {
@@ -54,7 +64,7 @@ const MainPage = () => {
             const tempLine = new Konva.Line({
                 points: line.points,
                 stroke: line.color,
-                strokeWidth: 8,
+                strokeWidth: line.drawingSize,
             });
             tempLayer.add(tempLine);
         });
@@ -79,23 +89,34 @@ const MainPage = () => {
             <Header />
             <Container fluid>
                 <Row>
-                    <Col xs={10} className={styles.col}>
+                    <Col xs={9} className={styles.col}>
                         <PhotoEditor
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
                             scale={scale}
+                            drawColor={color}
+                            drawingSize={lineSize}
                             selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
                             onSaveLines={setLines}
                         />
                     </Col>
-                    <Col xs={2} className={styles.col}>
-                        <div style={{ maxHeight: '100vh', overflowY: 'auto' }}>
+
+                    <Col xs={3} className={styles.col}>
+                        <div
+                            style={{
+                                height: '95vh',
+                                overflowY: 'auto',
+                            }}
+                        >
                             <Sidebar
                                 imageSize={imageSize}
                                 scale={scale}
+                                color={color}
+                                onColorChange={handleColorChange}
                                 onScaleChange={handleScaleChange}
                                 onSaveImage={handleSave}
+                                onBrushSizeChange={handleLineSizeChange}
                                 onToolChange={handleToolChange}
                                 selectedTool={selectedTool}
                             />

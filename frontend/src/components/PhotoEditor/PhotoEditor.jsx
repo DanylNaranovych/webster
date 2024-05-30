@@ -10,6 +10,8 @@ const PhotoEditor = ({
     onImageSizeChange,
     onScaleChange,
     scale,
+    drawColor,
+    drawingSize,
     onSaveImage,
     onSaveLines,
     selectedTool,
@@ -27,7 +29,6 @@ const PhotoEditor = ({
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lines, setLines] = useState([]);
     const [isDrawing, setIsDrawing] = useState(false);
-    const [drawColor] = useState('black');
 
     const handleDeleteImage = () => {
         setImageSrc(null);
@@ -95,7 +96,6 @@ const PhotoEditor = ({
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {
-            console.log(transformerRef);
             transformerRef.current.nodes([imageRef.current]);
             transformerRef.current.getLayer().batchDraw();
         }
@@ -140,7 +140,7 @@ const PhotoEditor = ({
                 y >= 0 &&
                 y <= imageSize.height
             ) {
-                setLines([...lines, { points: [x, y], color }]);
+                setLines([...lines, { points: [x, y], color, drawingSize }]);
             }
             return;
         }
@@ -152,13 +152,12 @@ const PhotoEditor = ({
         const pointer = stage.getPointerPosition();
         setDragStart({ x: pointer.x - stage.x(), y: pointer.y - stage.y() });
     };
-    console.log(selectedTool);
+
     const handleMouseMove = (e) => {
         if (
             isDrawing &&
             (selectedTool === 'draw' || selectedTool === 'erase')
         ) {
-            console.log('chec');
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -246,11 +245,12 @@ const PhotoEditor = ({
                                 key={i}
                                 points={line.points}
                                 stroke={line.color}
-                                strokeWidth={8}
+                                strokeWidth={line.drawingSize}
                             />
                         ))}
                         {selectedImage && (
                             <Transformer
+                                rotateEnabled={false}
                                 ref={transformerRef}
                                 boundBoxFunc={(oldBox, newBox) => {
                                     const imageWidth =
