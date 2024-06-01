@@ -13,6 +13,8 @@ const MainPage = () => {
     const [image, setImage] = useState(null);
     const [lineSize, setLineSize] = useState(2);
     const [lines, setLines] = useState([]);
+    const [texts, setTexts] = useState([]);
+    const [selectedText, setSelectedText] = useState(null);
     const [selectedTool, setSelectedTool] = useState('select');
     const [color, setColor] = useState('#000');
 
@@ -38,6 +40,10 @@ const MainPage = () => {
 
     const handleToolChange = (mode) => {
         setSelectedTool(mode);
+    };
+
+    const handleSelectText = (index) => {
+        setSelectedText(index);
     };
 
     const handleSave = () => {
@@ -67,6 +73,18 @@ const MainPage = () => {
                 strokeWidth: line.drawingSize,
             });
             tempLayer.add(tempLine);
+        });
+
+        texts.forEach((textData) => {
+            const tempText = new Konva.Text({
+                x: textData.x,
+                y: textData.y,
+                text: textData.text,
+                fontSize: textData.fontSize,
+                fontFamily: textData.fontFamily,
+                fill: textData.color,
+            });
+            tempLayer.add(tempText);
         });
 
         tempStage.add(tempLayer);
@@ -99,6 +117,10 @@ const MainPage = () => {
                             selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
                             onSaveLines={setLines}
+                            texts={texts}
+                            setTexts={setTexts}
+                            onSelectedText={handleSelectText}
+                            selectedText={selectedText}
                         />
                     </Col>
 
@@ -119,6 +141,9 @@ const MainPage = () => {
                                 onBrushSizeChange={handleLineSizeChange}
                                 onToolChange={handleToolChange}
                                 selectedTool={selectedTool}
+                                texts={texts}
+                                selectedText={selectedText}
+                                onSelectedText={handleSelectText}
                             />
                         </div>
                     </Col>

@@ -1,0 +1,74 @@
+:root {
+    --primary-color: #0d6efd;
+    --secondary-color: #ffffff;
+    --border-color: #dddddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --hover-shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Text items */
+.textItem,
+.selected {
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textItem:hover,
+.selected:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px var(--hover-shadow-color);
+}
+
+/* Text item specific styles */
+.textItem {
+    background-color: var(--secondary-color);
+}
+
+.selected {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.cardContent {
+    grid-template-columns: auto 1fr;
+    row-gap: 8px;
+}
+
+/* Text properties */
+.textProperty {
+    margin-right: 15px;
+    font-weight: bold;
+    color: #333333;
+}
+
+.textValue {
+    font-weight: normal;
+}
+
+/* Color swatch */
+.colorSwatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 0 2px var(--secondary-color), 0 0 0 4px var(--border-color),
+        0 2px 4px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.colorSwatch:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--secondary-color), 0 0 0 6px var(--primary-color),
+        0 4px 8px var(--hover-shadow-color);
+}
+
+/* Text row */
+.textRow {
+    display: flex;
+    align-items: center;
+}

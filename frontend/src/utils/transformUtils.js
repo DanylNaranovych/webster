@@ -1,31 +1,47 @@
-export const handleTransformEnd = (imageRef, lines, setLines, setImageSize) => {
+export const handleTransformEnd = (
+    image,
+    imageRef,
+    stageRef,
+    lines,
+    setLines,
+    imageSize,
+    setImageSize,
+    setImage,
+) => {
     const node = imageRef.current;
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
-
-    const newWidth = Math.max(20, node.width() * scaleX);
-    const newHeight = Math.max(20, node.height() * scaleY);
-
     node.scaleX(1);
     node.scaleY(1);
-
-    setImageSize({
-        width: newWidth,
-        height: newHeight,
+    const layer = new window.Konva.Layer();
+    const tempImage = new window.Konva.Image({
+        image: image,
+        width: imageSize.width,
+        height: imageSize.height,
     });
 
-    const updatedLines = lines.map((line) => {
-        const updatedPoints = line.points.map((point, index) => {
-            if (index % 2 === 0) {
-                return point * scaleX;
-            } else {
-                return point * scaleY;
-            }
+    layer.add(tempImage);
+
+    lines.forEach((line) => {
+        const tempLine = new window.Konva.Line({
+            points: line.points,
+            stroke: line.color,
+            strokeWidth: line.drawingSize,
+            draggable: false,
         });
-        return {
-            ...line,
-            points: updatedPoints,
-        };
+        layer.add(tempLine);
     });
-    setLines(updatedLines);
+
+    const canvas = layer.toCanvas();
+    const newImage = new window.Image();
+    newImage.src = canvas.toDataURL();
+
+    newImage.onload = () => {
+        setImage(newImage);
+        setImageSize({
+            width: Math.max(20, node.width() * scaleX),
+            height: Math.max(20, node.height() * scaleY),
+        });
+        setLines([]);
+    };
 };

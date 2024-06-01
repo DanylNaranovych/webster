@@ -7,17 +7,21 @@ import {
     Button,
     OverlayTrigger,
     Tooltip,
+    ListGroup,
 } from 'react-bootstrap';
 import { SketchPicker, SwatchesPicker } from 'react-color';
+import { AiOutlineSelect } from 'react-icons/ai';
+import { BiText } from 'react-icons/bi';
 import {
     FaPaintBrush,
     FaEraser,
     FaPencilAlt,
-    FaRuler,
     FaSquare,
     FaCircle,
     FaSprayCan,
 } from 'react-icons/fa';
+
+import styles from '../styles/Sidebar.module.css';
 
 const Sidebar = ({
     imageSize,
@@ -29,7 +33,10 @@ const Sidebar = ({
     onBrushChange,
     onColorChange,
     onBrushSizeChange,
+    selectedText,
+    onSelectedText,
     selectedTool,
+    texts,
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
@@ -46,6 +53,10 @@ const Sidebar = ({
     const handleBrushSizeChange = (size) => {
         setBrushSize(size);
         onBrushSizeChange(size);
+    };
+
+    const handleTextSelection = (index) => {
+        onSelectedText(index);
     };
 
     const renderTooltip = (text) => (
@@ -95,6 +106,19 @@ const Sidebar = ({
                 <div className="d-flex">
                     <OverlayTrigger
                         placement="top"
+                        overlay={renderTooltip('Select')}
+                    >
+                        <Button
+                            variant={
+                                selectedTool === 'select' ? 'primary' : 'light'
+                            }
+                            onClick={() => onToolChange('select')}
+                        >
+                            <AiOutlineSelect />
+                        </Button>
+                    </OverlayTrigger>
+                    <OverlayTrigger
+                        placement="top"
                         overlay={renderTooltip('Draw')}
                     >
                         <Button
@@ -121,13 +145,15 @@ const Sidebar = ({
                     </OverlayTrigger>
                     <OverlayTrigger
                         placement="top"
-                        overlay={renderTooltip('Line')}
+                        overlay={renderTooltip('Text')}
                     >
                         <Button
-                            variant="light"
-                            onClick={() => onToolChange('line')}
+                            variant={
+                                selectedTool === 'text' ? 'primary' : 'light'
+                            }
+                            onClick={() => onToolChange('text')}
                         >
-                            <FaRuler />
+                            <BiText />
                         </Button>
                     </OverlayTrigger>
                     <OverlayTrigger
@@ -291,6 +317,8 @@ const Sidebar = ({
 
                 <SketchPicker
                     color={localColor}
+                    width="99%"
+                    height="100%"
                     onChangeComplete={handleColorChange}
                 />
             </Nav.Item>
@@ -298,8 +326,62 @@ const Sidebar = ({
                 <Form.Label>Brush Color</Form.Label>
                 <SwatchesPicker
                     color={localColor}
+                    width="100%"
+                    height="100%"
                     onChangeComplete={handleColorChange}
                 />
+            </Nav.Item>
+            <Nav.Item className="mb-3">
+                <Form.Label>Texts</Form.Label>
+                <ListGroup>
+                    {texts.map((textItem, index) => (
+                        <ListGroup.Item
+                            key={index}
+                            className={`list-group-item ${
+                                selectedText === textItem.id
+                                    ? `${styles.selected}`
+                                    : `${styles.textItem}`
+                            }`}
+                            onClick={() =>
+                                handleTextSelection(
+                                    selectedText === textItem.id
+                                        ? null
+                                        : textItem.id,
+                                )
+                            }
+                        >
+                            <div className={styles.cardContent}>
+                                <div className={styles.textRow}>
+                                    <span className={styles.textProperty}>
+                                        Text:
+                                    </span>
+                                    <span className={styles.textValue}>
+                                        {textItem.text}
+                                    </span>
+                                </div>
+                                <div className={styles.textRow}>
+                                    <span className={styles.textProperty}>
+                                        Color:
+                                    </span>
+                                    <span
+                                        className={styles.colorSwatch}
+                                        style={{
+                                            backgroundColor: textItem.color,
+                                        }}
+                                    ></span>
+                                </div>
+                                <div className={styles.textRow}>
+                                    <span className={styles.textProperty}>
+                                        Font Size:
+                                    </span>
+                                    <span className={styles.textValue}>
+                                        {textItem.fontSize}px
+                                    </span>
+                                </div>
+                            </div>
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
             </Nav.Item>
         </Nav>
     );
