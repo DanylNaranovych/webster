@@ -6,7 +6,6 @@
     --hover-shadow-color: rgba(0, 0, 0, 0.2);
 }
 
-/* Text items */
 .textItem,
 .selected {
     padding: 20px;
@@ -22,7 +21,6 @@
     box-shadow: 0 12px 24px var(--hover-shadow-color);
 }
 
-/* Text item specific styles */
 .textItem {
     background-color: var(--secondary-color);
 }
@@ -38,18 +36,20 @@
     row-gap: 8px;
 }
 
-/* Text properties */
 .textProperty {
     margin-right: 15px;
     font-weight: bold;
     color: #333333;
 }
 
+.selected .textProperty {
+    color: var(--secondary-color);
+}
+
 .textValue {
     font-weight: normal;
 }
 
-/* Color swatch */
 .colorSwatch {
     width: 20px;
     height: 20px;
@@ -67,7 +67,6 @@
         0 4px 8px var(--hover-shadow-color);
 }
 
-/* Text row */
 .textRow {
     display: flex;
     align-items: center;

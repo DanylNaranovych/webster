@@ -4,7 +4,8 @@ import { Stage, Layer, Image, Transformer, Line } from 'react-konva';
 import useImagePaste from './hooks/useImagePaste';
 import useDeleteImage from './hooks/useDeleteImage';
 import { handleTransformEnd } from '../../utils/transformUtils';
-import EditableText from '../EditableText'; // Импортируйте ваш новый компонент
+import EditableText from '../EditableText';
+import ImageControls from './ImageControls';
 import styles from '../../styles/PhotoEditor.module.css';
 
 const PhotoEditor = ({
@@ -272,63 +273,74 @@ const PhotoEditor = ({
                 </div>
             )}
             {imageSrc && (
-                <Stage
-                    width={stageSize.width}
-                    height={stageSize.height}
-                    ref={stageRef}
-                    scaleX={scale}
-                    scaleY={scale}
-                    onWheel={handleWheel}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                    onTouchStart={handleMouseDown}
-                    onTouchMove={handleMouseMove}
-                    onTouchEnd={handleMouseUp}
-                >
-                    <Layer>
-                        {image && (
-                            <Image
-                                image={image}
-                                width={imageSize.width}
-                                height={imageSize.height}
-                                ref={imageRef}
-                                onClick={() => handleClickOrTap(image)}
-                                onTap={() => handleClickOrTap(image)}
-                                onTransformEnd={() =>
-                                    handleTransformEnd(
-                                        image,
-                                        imageRef,
-                                        stageRef,
-                                        lines,
-                                        setLines,
-                                        imageSize,
-                                        setImageSize,
-                                        setImage,
-                                    )
-                                }
-                            />
-                        )}
-                        {lines.map((line, i) => (
-                            <Line
-                                key={i}
-                                points={line.points}
-                                stroke={line.color}
-                                strokeWidth={line.drawingSize}
-                            />
-                        ))}
-                        {texts.map((text, i) => (
-                            <EditableText
-                                key={i}
-                                textProps={text}
-                                isSelected={text.id === selectedText}
-                                onChange={handleTextChange}
-                            />
-                        ))}
-                        {selectedImage && <Transformer ref={transformerRef} />}
-                    </Layer>
-                </Stage>
+                <>
+                    <Stage
+                        width={stageSize.width}
+                        height={stageSize.height}
+                        ref={stageRef}
+                        scaleX={scale}
+                        scaleY={scale}
+                        onWheel={handleWheel}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        onTouchStart={handleMouseDown}
+                        onTouchMove={handleMouseMove}
+                        onTouchEnd={handleMouseUp}
+                    >
+                        <Layer>
+                            {image && (
+                                <Image
+                                    image={image}
+                                    width={imageSize.width}
+                                    height={imageSize.height}
+                                    ref={imageRef}
+                                    onClick={() => handleClickOrTap(image)}
+                                    onTap={() => handleClickOrTap(image)}
+                                    onTransformEnd={() =>
+                                        handleTransformEnd(
+                                            image,
+                                            imageRef,
+                                            stageRef,
+                                            lines,
+                                            setLines,
+                                            imageSize,
+                                            setImageSize,
+                                            setImage,
+                                        )
+                                    }
+                                />
+                            )}
+                            {lines.map((line, i) => (
+                                <Line
+                                    key={i}
+                                    points={line.points}
+                                    stroke={line.color}
+                                    strokeWidth={line.drawingSize}
+                                />
+                            ))}
+                            {texts.map((text, i) => (
+                                <EditableText
+                                    key={i}
+                                    textProps={text}
+                                    isSelected={text.id === selectedText}
+                                    onChange={handleTextChange}
+                                />
+                            ))}
+                            {selectedImage && (
+                                <Transformer ref={transformerRef} />
+                            )}
+                        </Layer>
+                    </Stage>
+                    <div className={styles.controlsOverlay}>
+                        <ImageControls
+                            imageSize={imageSize}
+                            scale={scale}
+                            onScaleChange={onScaleChange}
+                        />
+                    </div>
+                </>
             )}
         </div>
     );

@@ -2,11 +2,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Text, Transformer } from 'react-konva';
 
 const EditableText = ({ textProps, isSelected, onChange }) => {
-    console.log(textProps);
     const shapeRef = useRef();
     const trRef = useRef();
     const [text, setText] = useState(textProps.text);
-    const [color] = useState(textProps.color);
 
     useEffect(() => {
         if (isSelected) {
@@ -21,7 +19,7 @@ const EditableText = ({ textProps, isSelected, onChange }) => {
                 ref={shapeRef}
                 {...textProps}
                 text={text}
-                fill={color}
+                fill={textProps.color}
                 draggable={isSelected}
                 onDragEnd={(e) => {
                     if (trRef.current) {

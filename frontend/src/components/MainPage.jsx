@@ -4,7 +4,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import styles from '../styles/MainPage.module.css';
 
 import Header from './Header';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar/Sidebar';
 import PhotoEditor from './PhotoEditor/PhotoEditor';
 
 const MainPage = () => {
@@ -17,6 +17,22 @@ const MainPage = () => {
     const [selectedText, setSelectedText] = useState(null);
     const [selectedTool, setSelectedTool] = useState('select');
     const [color, setColor] = useState('#000');
+
+    const handleUpdateText = (color, fontSize, selectedTextId) => {
+        if (selectedTextId) {
+            const updatedTexts = texts.map((text) => {
+                if (text.id === selectedTextId) {
+                    return {
+                        ...text,
+                        color: color,
+                        fontSize: fontSize,
+                    };
+                }
+                return text;
+            });
+            setTexts([...updatedTexts]);
+        }
+    };
 
     const handleImageSizeChange = (newSize) => {
         setImageSize(newSize);
@@ -132,11 +148,8 @@ const MainPage = () => {
                             }}
                         >
                             <Sidebar
-                                imageSize={imageSize}
-                                scale={scale}
                                 color={color}
                                 onColorChange={handleColorChange}
-                                onScaleChange={handleScaleChange}
                                 onSaveImage={handleSave}
                                 onBrushSizeChange={handleLineSizeChange}
                                 onToolChange={handleToolChange}
@@ -144,6 +157,7 @@ const MainPage = () => {
                                 texts={texts}
                                 selectedText={selectedText}
                                 onSelectedText={handleSelectText}
+                                onUpdateText={handleUpdateText}
                             />
                         </div>
                     </Col>
