@@ -17,6 +17,13 @@ const MainPage = () => {
     const [selectedText, setSelectedText] = useState(null);
     const [selectedTool, setSelectedTool] = useState('select');
     const [color, setColor] = useState('#000');
+    const [effectsValues, setEffectsValues] = useState({
+        brightness: 0,
+        contrast: 0,
+        grayscale: 0,
+        saturate: 0,
+        blur: 0,
+    });
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
         if (selectedTextId) {
@@ -32,6 +39,13 @@ const MainPage = () => {
             });
             setTexts([...updatedTexts]);
         }
+    };
+
+    const handleEffectsValuesChange = (effect, value) => {
+        setEffectsValues((prevValues) => ({
+            ...prevValues,
+            [effect]: value,
+        }));
     };
 
     const handleImageSizeChange = (newSize) => {
@@ -137,6 +151,7 @@ const MainPage = () => {
                             setTexts={setTexts}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}
+                            effectsValues={effectsValues}
                         />
                     </Col>
 
@@ -158,6 +173,8 @@ const MainPage = () => {
                                 selectedText={selectedText}
                                 onSelectedText={handleSelectText}
                                 onUpdateText={handleUpdateText}
+                                effectsValues={effectsValues}
+                                onEffectsValuesChange={handleEffectsValuesChange}
                             />
                         </div>
                     </Col>

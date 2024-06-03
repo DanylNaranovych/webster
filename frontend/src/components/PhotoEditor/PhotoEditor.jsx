@@ -20,6 +20,7 @@ const PhotoEditor = ({
     texts,
     setTexts,
     selectedText,
+    effectsValues,
 }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
@@ -34,6 +35,7 @@ const PhotoEditor = ({
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lines, setLines] = useState([]);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [previousValues, setPreviousValues] = useState(effectsValues);
 
     const handleDeleteImage = () => {
         setImageSrc(null);
@@ -112,6 +114,20 @@ const PhotoEditor = ({
             transformerRef.current.getLayer().batchDraw();
         }
     }, [selectedImage]);
+
+    useEffect(() => {
+        if (effectsValues) {
+            Object.keys(effectsValues).forEach((key) => {
+                if (effectsValues[key] !== previousValues[key]) {
+                    console.log(`Effect parameter "${key}" changed from ${previousValues[key]} to ${effectsValues[key]}`);
+                    // Handle the change as needed
+                }
+            });
+
+            setPreviousValues(effectsValues);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [effectsValues]);
 
     const handleWheel = (e) => {
         e.evt.preventDefault();

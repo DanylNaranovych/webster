@@ -33,6 +33,8 @@ const Sidebar = ({
     selectedTool,
     onUpdateText,
     texts,
+    effectsValues,
+    onEffectsValuesChange,
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
@@ -68,6 +70,93 @@ const Sidebar = ({
             <Nav.Item>
                 <h5 className="mb-4">Edit Options</h5>
             </Nav.Item>
+            <Accordion className="mt-1">
+                <Accordion.Item eventKey="0">
+                    <Accordion.Header>Effects</Accordion.Header>
+                    <Accordion.Body>
+                    <Nav.Item className="mb-3">
+                            <div className="d-flex align-items-center">
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Select')}
+                                >
+                                    <Form.Group className="me-3">
+                                        <Form.Label>Brightness</Form.Label>
+                                        <Form.Range
+                                            min="0"
+                                            max="100"
+                                            step="5"
+                                            value={effectsValues.brightness}
+                                            onChange={(e) => onEffectsValuesChange('brightness', e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Draw')}
+                                >
+                                    <Form.Group className="me-3">
+                                        <Form.Label>Contrast</Form.Label>
+                                        <Form.Range
+                                            min="0"
+                                            max="100"
+                                            step="5"
+                                            value={effectsValues.contrast}
+                                            onChange={(e) => onEffectsValuesChange('contrast', e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Erase')}
+                                >
+                                    <Form.Group className="me-3">
+                                        <Form.Label>Grayscale</Form.Label>
+                                        <Form.Range
+                                            min="0"
+                                            max="100"
+                                            step="5"
+                                            value={effectsValues.grayscale}
+                                            onChange={(e) => onEffectsValuesChange('grayscale', e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Text')}
+                                >
+                                    <Form.Group className="me-3">
+                                        <Form.Label>Saturate</Form.Label>
+                                        <Form.Range
+                                            min="0"
+                                            max="100"
+                                            step="5"
+                                            value={effectsValues.saturate}
+                                            onChange={(e) => onEffectsValuesChange('saturate', e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Rectangle')}
+                                >
+                                    <Form.Group className="me-3">
+                                        <Form.Label>Blur</Form.Label>
+                                        <Form.Range
+                                            min="0"
+                                            max="100"
+                                            step="5"
+                                            value={effectsValues.blur}
+                                            onChange={(e) => onEffectsValuesChange('blur', e.target.value)}
+                                        />
+                                    </Form.Group>
+                                </OverlayTrigger>
+                            </div>
+                        </Nav.Item>
+                    </Accordion.Body>
+                </Accordion.Item>
+            </Accordion>
+
             <Accordion className="mt-1">
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Tools</Accordion.Header>
@@ -206,9 +295,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 5 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 5 ? 'active' : ''
+                                            }`}
                                         onClick={() => handleBrushSizeChange(5)}
                                     >
                                         <span style={{ fontSize: '14px' }}>
@@ -222,9 +310,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 10 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 10 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(10)
                                         }
@@ -240,9 +327,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 15 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 15 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(15)
                                         }
@@ -258,9 +344,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 20 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 20 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(20)
                                         }
