@@ -17,6 +17,7 @@ import {
     FaSquare,
     FaCircle,
     FaSprayCan,
+    FaFill,
 } from 'react-icons/fa';
 
 import TextItemsList from './TextItemsList';
@@ -25,7 +26,6 @@ const Sidebar = ({
     color,
     onSaveImage,
     onToolChange,
-    onBrushChange,
     onColorChange,
     onBrushSizeChange,
     selectedText,
@@ -35,6 +35,8 @@ const Sidebar = ({
     texts,
     effectsValues,
     onEffectsValuesChange,
+    brushType,
+    onChangeBrushType,
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
@@ -74,7 +76,7 @@ const Sidebar = ({
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Effects</Accordion.Header>
                     <Accordion.Body>
-                    <Nav.Item className="mb-3">
+                        <Nav.Item className="mb-3">
                             <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
@@ -87,7 +89,12 @@ const Sidebar = ({
                                             max="100"
                                             step="5"
                                             value={effectsValues.brightness}
-                                            onChange={(e) => onEffectsValuesChange('brightness', e.target.value)}
+                                            onChange={(e) =>
+                                                onEffectsValuesChange(
+                                                    'brightness',
+                                                    e.target.value,
+                                                )
+                                            }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
@@ -102,7 +109,12 @@ const Sidebar = ({
                                             max="100"
                                             step="5"
                                             value={effectsValues.contrast}
-                                            onChange={(e) => onEffectsValuesChange('contrast', e.target.value)}
+                                            onChange={(e) =>
+                                                onEffectsValuesChange(
+                                                    'contrast',
+                                                    e.target.value,
+                                                )
+                                            }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
@@ -117,7 +129,12 @@ const Sidebar = ({
                                             max="100"
                                             step="5"
                                             value={effectsValues.grayscale}
-                                            onChange={(e) => onEffectsValuesChange('grayscale', e.target.value)}
+                                            onChange={(e) =>
+                                                onEffectsValuesChange(
+                                                    'grayscale',
+                                                    e.target.value,
+                                                )
+                                            }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
@@ -132,7 +149,12 @@ const Sidebar = ({
                                             max="100"
                                             step="5"
                                             value={effectsValues.saturate}
-                                            onChange={(e) => onEffectsValuesChange('saturate', e.target.value)}
+                                            onChange={(e) =>
+                                                onEffectsValuesChange(
+                                                    'saturate',
+                                                    e.target.value,
+                                                )
+                                            }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
@@ -147,7 +169,12 @@ const Sidebar = ({
                                             max="100"
                                             step="5"
                                             value={effectsValues.blur}
-                                            onChange={(e) => onEffectsValuesChange('blur', e.target.value)}
+                                            onChange={(e) =>
+                                                onEffectsValuesChange(
+                                                    'blur',
+                                                    e.target.value,
+                                                )
+                                            }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
@@ -229,7 +256,11 @@ const Sidebar = ({
                                     overlay={renderTooltip('Rectangle')}
                                 >
                                     <Button
-                                        variant="light"
+                                        variant={
+                                            selectedTool === 'rect'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
                                         onClick={() => onToolChange('rect')}
                                     >
                                         <FaSquare />
@@ -240,7 +271,11 @@ const Sidebar = ({
                                     overlay={renderTooltip('Circle')}
                                 >
                                     <Button
-                                        variant="light"
+                                        variant={
+                                            selectedTool === 'circle'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
                                         onClick={() => onToolChange('circle')}
                                     >
                                         <FaCircle />
@@ -256,8 +291,14 @@ const Sidebar = ({
                                     overlay={renderTooltip('Pencil')}
                                 >
                                     <Button
-                                        variant="light"
-                                        onClick={() => onBrushChange('pencil')}
+                                        variant={
+                                            brushType === 'pencil'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
+                                        onClick={() =>
+                                            onChangeBrushType('pencil')
+                                        }
                                     >
                                         <FaPencilAlt />
                                     </Button>
@@ -267,8 +308,14 @@ const Sidebar = ({
                                     overlay={renderTooltip('Brush')}
                                 >
                                     <Button
-                                        variant="light"
-                                        onClick={() => onBrushChange('brush')}
+                                        variant={
+                                            brushType === 'brush'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
+                                        onClick={() =>
+                                            onChangeBrushType('brush')
+                                        }
                                     >
                                         <FaPaintBrush />
                                     </Button>
@@ -278,10 +325,33 @@ const Sidebar = ({
                                     overlay={renderTooltip('Spray')}
                                 >
                                     <Button
-                                        variant="light"
-                                        onClick={() => onBrushChange('spray')}
+                                        variant={
+                                            brushType === 'spray'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
+                                        onClick={() =>
+                                            onChangeBrushType('spray')
+                                        }
                                     >
                                         <FaSprayCan />
+                                    </Button>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={renderTooltip('Fill')}
+                                >
+                                    <Button
+                                        variant={
+                                            brushType === 'fill'
+                                                ? 'primary'
+                                                : 'light'
+                                        }
+                                        onClick={() =>
+                                            onChangeBrushType('fill')
+                                        }
+                                    >
+                                        <FaFill />
                                     </Button>
                                 </OverlayTrigger>
                             </div>
@@ -295,8 +365,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 5 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 5 ? 'active' : ''
+                                        }`}
                                         onClick={() => handleBrushSizeChange(5)}
                                     >
                                         <span style={{ fontSize: '14px' }}>
@@ -310,8 +381,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 10 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 10 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(10)
                                         }
@@ -327,8 +399,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 15 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 15 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(15)
                                         }
@@ -344,8 +417,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 20 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 20 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(20)
                                         }

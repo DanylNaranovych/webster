@@ -4,8 +4,9 @@ import { Stage, Layer, Image, Transformer, Line } from 'react-konva';
 import useImagePaste from './hooks/useImagePaste';
 import useDeleteImage from './hooks/useDeleteImage';
 import { handleTransformEnd } from '../../utils/transformUtils';
-import EditableText from '../EditableText';
+import EditableText from './EditableText';
 import ImageControls from './ImageControls';
+import AnnotationFigure from './AnnotationFigure';
 import styles from '../../styles/PhotoEditor.module.css';
 
 const PhotoEditor = ({
@@ -19,8 +20,11 @@ const PhotoEditor = ({
     selectedTool,
     texts,
     setTexts,
+    annotations,
+    setAnnotations,
     selectedText,
     effectsValues,
+    brushType,
 }) => {
     const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
@@ -34,8 +38,10 @@ const PhotoEditor = ({
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [lines, setLines] = useState([]);
+
     const [isDrawing, setIsDrawing] = useState(false);
     const [previousValues, setPreviousValues] = useState(effectsValues);
+    const [newAnnotation, setNewAnnotation] = useState([]);
 
     const handleDeleteImage = () => {
         setImageSrc(null);
@@ -73,19 +79,19 @@ const PhotoEditor = ({
 
     useEffect(() => {
         onImageSizeChange(imageSize);
+    }, [imageSize, onImageSizeChange]);
+
+    useEffect(() => {
         onSaveImage(image);
+    }, [image, onSaveImage]);
+
+    useEffect(() => {
         onScaleChange(scale);
+    }, [scale, onScaleChange]);
+
+    useEffect(() => {
         onSaveLines(lines);
-    }, [
-        imageSize,
-        scale,
-        image,
-        onSaveImage,
-        onImageSizeChange,
-        onScaleChange,
-        onSaveLines,
-        lines,
-    ]);
+    }, [lines, onSaveLines]);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -119,7 +125,9 @@ const PhotoEditor = ({
         if (effectsValues) {
             Object.keys(effectsValues).forEach((key) => {
                 if (effectsValues[key] !== previousValues[key]) {
-                    console.log(`Effect parameter "${key}" changed from ${previousValues[key]} to ${effectsValues[key]}`);
+                    console.log(
+                        `Effect parameter "${key}" changed from ${previousValues[key]} to ${effectsValues[key]}`,
+                    );
                     // Handle the change as needed
                 }
             });
@@ -157,6 +165,7 @@ const PhotoEditor = ({
         if (selectedTool === 'draw' || selectedTool === 'erase') {
             setIsDrawing(true);
             const color = selectedTool === 'erase' ? 'white' : drawColor;
+            const size = brushType === 'pencil' ? drawingSize / 2 : drawingSize;
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -170,10 +179,41 @@ const PhotoEditor = ({
             const x = (pointerPosition.x - stagePos.x) / scale;
             const y = (pointerPosition.y - stagePos.y) / scale;
             if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                setLines([...lines, { points: [x, y], color, drawingSize }]);
+                setLines([...lines, { points: [x, y], color, size }]);
             }
             return;
         }
+
+        if (selectedTool === 'rect' || selectedTool === 'circle') {
+            const stage = stageRef.current;
+            const scale = stage.scaleX();
+            const pointerPosition = stage.getPointerPosition();
+            const stagePos = stage.position();
+            const imageNode = imageRef.current;
+            const imagePosition = imageNode.position();
+            const x1 = imagePosition.x;
+            const y1 = imagePosition.y;
+            const x2 = x1 + imageNode.width();
+            const y2 = y1 + imageNode.height();
+            const x = (pointerPosition.x - stagePos.x) / scale;
+            const y = (pointerPosition.y - stagePos.y) / scale;
+            if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+                if (newAnnotation.length === 0) {
+                    setNewAnnotation([
+                        {
+                            x,
+                            y,
+                            width: 0,
+                            height: 0,
+                            key: '0',
+                            color: drawColor,
+                            size: drawingSize,
+                        },
+                    ]);
+                }
+            }
+        }
+
         if (selectedTool === 'text') {
             const id = texts.length + 1;
             const stage = stageRef.current;
@@ -219,7 +259,11 @@ const PhotoEditor = ({
     const handleMouseMove = (e) => {
         if (
             isDrawing &&
-            (selectedTool === 'draw' || selectedTool === 'erase')
+            (selectedTool === 'draw' ||
+                selectedTool === 'erase' ||
+                brushType === 'pencil' ||
+                brushType === 'brush' ||
+                brushType === 'spray')
         ) {
             const stage = stageRef.current;
             const scale = stage.scaleX();
@@ -234,23 +278,92 @@ const PhotoEditor = ({
             const x = (pointerPosition.x - stagePos.x) / scale;
             const y = (pointerPosition.y - stagePos.y) / scale;
             if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                const lastLine = lines[lines.length - 1];
-                if (lastLine) {
-                    const lastPoint = lastLine.points.slice(-2);
-                    const distance = Math.hypot(
-                        x - lastPoint[0],
-                        y - lastPoint[1],
-                    );
-                    if (distance > 2) {
-                        lastLine.points = lastLine.points.concat([x, y]);
-                        setLines([
-                            ...lines.slice(0, lines.length - 1),
-                            lastLine,
-                        ]);
+                if (brushType === 'spray') {
+                    const sprayRadius = 10;
+                    const sprayDensity = 10;
+                    const sprayPoints = [];
+
+                    for (let i = 0; i < sprayDensity; i++) {
+                        const angle = Math.random() * 2 * Math.PI;
+                        const radius = Math.sqrt(Math.random()) * sprayRadius;
+                        const xPoint = x + radius * Math.cos(angle);
+                        const yPoint = y + radius * Math.sin(angle);
+                        sprayPoints.push([xPoint, yPoint]);
+                    }
+
+                    const flattenedPoints = sprayPoints.reduce((acc, point) => {
+                        acc.push(point[0], point[1]);
+                        return acc;
+                    }, []);
+
+                    const newLine = {
+                        points: flattenedPoints,
+                        color: drawColor,
+                        size: drawingSize,
+                    };
+                    setLines([...lines, newLine]);
+                }
+
+                if (brushType === 'brush') {
+                    const lastLine = lines[lines.length - 1];
+                    if (lastLine) {
+                        const lastPoint = lastLine.points.slice(-2);
+                        const distance = Math.hypot(
+                            x - lastPoint[0],
+                            y - lastPoint[1],
+                        );
+                        if (distance > 5) {
+                            lastLine.points = lastLine.points.concat([x, y]);
+                            setLines([
+                                ...lines.slice(0, lines.length - 1),
+                                lastLine,
+                            ]);
+                        }
+                    }
+                }
+
+                if (brushType === 'pencil' || selectedTool === 'erase') {
+                    const lastLine = lines[lines.length - 1];
+                    if (lastLine) {
+                        const lastPoint = lastLine.points.slice(-2);
+                        const distance = Math.hypot(
+                            x - lastPoint[0],
+                            y - lastPoint[1],
+                        );
+                        if (distance > 2) {
+                            lastLine.points = lastLine.points.concat([x, y]);
+                            setLines([
+                                ...lines.slice(0, lines.length - 1),
+                                lastLine,
+                            ]);
+                        }
                     }
                 }
             }
             return;
+        }
+
+        if (selectedTool === 'rect' && newAnnotation.length === 1) {
+            const sx = newAnnotation[0].x;
+            const sy = newAnnotation[0].y;
+
+            const stage = stageRef.current;
+            const scale = stage.scaleX();
+            const pointerPosition = stage.getPointerPosition();
+            const stagePos = stage.position();
+            const x = (pointerPosition.x - stagePos.x) / scale;
+            const y = (pointerPosition.y - stagePos.y) / scale;
+            setNewAnnotation([
+                {
+                    x: sx,
+                    y: sy,
+                    width: x - sx,
+                    height: y - sy,
+                    key: '0',
+                    color: drawColor,
+                    size: drawingSize,
+                },
+            ]);
         }
         if (!isDragging) return;
         if (selectedTool === 'select') {
@@ -265,18 +378,41 @@ const PhotoEditor = ({
         }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e) => {
         setIsDragging(false);
         setIsDrawing(false);
+        if (selectedTool === 'rect' && newAnnotation.length === 1) {
+            const sx = newAnnotation[0].x;
+            const sy = newAnnotation[0].y;
+            const stage = stageRef.current;
+            const scale = stage.scaleX();
+            const pointerPosition = stage.getPointerPosition();
+            const stagePos = stage.position();
+            const x = (pointerPosition.x - stagePos.x) / scale;
+            const y = (pointerPosition.y - stagePos.y) / scale;
+            const annotationToAdd = {
+                x: sx,
+                y: sy,
+                width: x - sx,
+                height: y - sy,
+                color: drawColor,
+                key: annotations.length + 1,
+                size: drawingSize,
+            };
+            annotations.push(annotationToAdd);
+            setNewAnnotation([]);
+            setAnnotations(annotations);
+        }
     };
 
     const handleTextChange = (newAttrs) => {
         const rects = texts.slice();
         const index = rects.findIndex((rect) => rect.id === newAttrs.id);
         rects[index] = newAttrs;
-        console.log(rects);
         setTexts(rects);
     };
+
+    const annotationsToDraw = [...annotations, ...newAnnotation];
 
     return (
         <div ref={containerRef} className={styles.photoEditor}>
@@ -333,7 +469,7 @@ const PhotoEditor = ({
                                     key={i}
                                     points={line.points}
                                     stroke={line.color}
-                                    strokeWidth={line.drawingSize}
+                                    strokeWidth={line.size}
                                 />
                             ))}
                             {texts.map((text, i) => (
@@ -342,6 +478,15 @@ const PhotoEditor = ({
                                     textProps={text}
                                     isSelected={text.id === selectedText}
                                     onChange={handleTextChange}
+                                />
+                            ))}
+                            {annotationsToDraw.map((value) => (
+                                <AnnotationFigure
+                                    key={value.id}
+                                    value={value}
+                                    selectedTool={selectedTool}
+                                    brushType={brushType}
+                                    color={drawColor}
                                 />
                             ))}
                             {selectedImage && (

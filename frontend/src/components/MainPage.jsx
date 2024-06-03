@@ -14,8 +14,10 @@ const MainPage = () => {
     const [lineSize, setLineSize] = useState(2);
     const [lines, setLines] = useState([]);
     const [texts, setTexts] = useState([]);
+    const [figures, setFigures] = useState([]);
     const [selectedText, setSelectedText] = useState(null);
     const [selectedTool, setSelectedTool] = useState('select');
+    const [brushType, setBrushType] = useState('pencil');
     const [color, setColor] = useState('#000');
     const [effectsValues, setEffectsValues] = useState({
         brightness: 0,
@@ -48,6 +50,11 @@ const MainPage = () => {
         }));
     };
 
+    const handleChangeBrushType = (brushType) => {
+        setBrushType(brushType);
+        setSelectedTool('draw');
+    };
+
     const handleImageSizeChange = (newSize) => {
         setImageSize(newSize);
     };
@@ -69,6 +76,9 @@ const MainPage = () => {
     };
 
     const handleToolChange = (mode) => {
+        if (mode === 'erase') {
+            setBrushType(null);
+        }
         setSelectedTool(mode);
     };
 
@@ -117,6 +127,19 @@ const MainPage = () => {
             tempLayer.add(tempText);
         });
 
+        figures.forEach((figure) => {
+            const tempText = new Konva.Rect({
+                x: figure.x,
+                y: figure.y,
+                width: figure.width,
+                height: figure.height,
+                fill: figure.fill,
+                stroke: figure.color,
+                strokeWidth: figure.size,
+            });
+            tempLayer.add(tempText);
+        });
+
         tempStage.add(tempLayer);
 
         const uri = tempStage.toDataURL();
@@ -149,9 +172,12 @@ const MainPage = () => {
                             onSaveLines={setLines}
                             texts={texts}
                             setTexts={setTexts}
+                            annotations={figures}
+                            setAnnotations={setFigures}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}
                             effectsValues={effectsValues}
+                            brushType={brushType}
                         />
                     </Col>
 
@@ -174,7 +200,11 @@ const MainPage = () => {
                                 onSelectedText={handleSelectText}
                                 onUpdateText={handleUpdateText}
                                 effectsValues={effectsValues}
-                                onEffectsValuesChange={handleEffectsValuesChange}
+                                onEffectsValuesChange={
+                                    handleEffectsValuesChange
+                                }
+                                brushType={brushType}
+                                onChangeBrushType={handleChangeBrushType}
                             />
                         </div>
                     </Col>
