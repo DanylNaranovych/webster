@@ -22,6 +22,8 @@ import {
 
 import TextItemsList from './TextItemsList';
 
+import styles from '../../styles/Sidebar.module.css';
+
 const Sidebar = ({
     color,
     onSaveImage,
@@ -68,7 +70,7 @@ const Sidebar = ({
     );
 
     return (
-        <Nav className={`flex-column p-3 `}>
+        <Nav className={`flex-column p-3 ${styles.sidebar}`}>
             <Nav.Item>
                 <h5 className="mb-4">Edit Options</h5>
             </Nav.Item>

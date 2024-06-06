@@ -3,7 +3,7 @@ import Konva from 'konva';
 import { Container, Row, Col } from 'react-bootstrap';
 import styles from '../styles/MainPage.module.css';
 
-import Header from './Header';
+import Header from './Header/Header';
 import Sidebar from './Sidebar/Sidebar';
 import PhotoEditor from './PhotoEditor/PhotoEditor';
 
@@ -166,7 +166,7 @@ const MainPage = () => {
                 width: imageSize.width,
                 height: imageSize.height,
             },
-            image: image.src, // assuming `image` is an HTMLImageElement
+            image: image.src,
             lines: lines.map((line) => ({
                 points: line.points,
                 color: line.color,
@@ -191,8 +191,8 @@ const MainPage = () => {
             })),
         };
 
-        const jsonData = JSON.stringify(data, null, 2); // добавляем форматирование для лучшей читаемости
-        console.log(jsonData); // выводим JSON в консоль
+        const jsonData = JSON.stringify(data, null, 2);
+        console.log(jsonData);
         return jsonData;
     };
 

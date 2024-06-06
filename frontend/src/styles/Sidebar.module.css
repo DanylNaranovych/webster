@@ -6,6 +6,11 @@
     --hover-shadow-color: rgba(0, 0, 0, 0.2);
 }
 
+.sidebar {
+    border-left: 1px solid black;
+    height: 100vh;
+}
+
 .textItem,
 .selected {
     padding: 20px;

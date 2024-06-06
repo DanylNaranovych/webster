@@ -8,7 +8,8 @@ import {
     Form,
     Dropdown,
 } from 'react-bootstrap';
-import styles from '../styles/Header.module.css';
+
+import styles from '../../styles/Header.module.css';
 
 const Header = () => {
     const [show, setShow] = useState(false);
@@ -42,20 +43,20 @@ const Header = () => {
                 sticky="top"
             >
                 <Container>
-                    <Navbar.Brand href="#home" className={styles.brand}>
+                    <Navbar.Brand href="/" className={styles.brand}>
                         Webster
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="#home" className={styles.navLink}>
+                            <Nav.Link href="/" className={styles.navLink}>
                                 Home
                             </Nav.Link>
-                            <Nav.Link href="#about" className={styles.navLink}>
+                            <Nav.Link href="/about" className={styles.navLink}>
                                 About
                             </Nav.Link>
                             <Nav.Link
-                                href="#contact"
+                                href="/contact"
                                 className={styles.navLink}
                             >
                                 Contact
@@ -76,22 +77,16 @@ const Header = () => {
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item
-                                        href="#/profile"
+                                        href="/profile"
                                         className={styles.userButton}
                                     >
                                         Profile
                                     </Dropdown.Item>
                                     <Dropdown.Item
-                                        href="#/settings"
+                                        href="/library"
                                         className={styles.userButton}
                                     >
-                                        Settings
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                        href="#/library"
-                                        className={styles.userButton}
-                                    >
-                                        My Lib
+                                        My Library
                                     </Dropdown.Item>
                                     <Dropdown.Divider />
                                     <Dropdown.Item
