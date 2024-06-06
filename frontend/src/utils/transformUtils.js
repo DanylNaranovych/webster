@@ -52,5 +52,6 @@ export const handleTransformEnd = (
 
     newImage.onload = () => {
         setImage(newImage);
+        setLines([]);
     };
 };

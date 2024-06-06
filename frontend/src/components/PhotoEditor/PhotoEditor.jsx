@@ -208,6 +208,7 @@ const PhotoEditor = ({
                             key: '0',
                             color: drawColor,
                             size: drawingSize,
+                            tool: selectedTool,
                         },
                     ]);
                 }
@@ -343,7 +344,10 @@ const PhotoEditor = ({
             return;
         }
 
-        if (selectedTool === 'rect' && newAnnotation.length === 1) {
+        if (
+            (selectedTool === 'rect' || selectedTool === 'circle') &&
+            newAnnotation.length === 1
+        ) {
             const sx = newAnnotation[0].x;
             const sy = newAnnotation[0].y;
 
@@ -362,6 +366,7 @@ const PhotoEditor = ({
                     key: '0',
                     color: drawColor,
                     size: drawingSize,
+                    tool: selectedTool,
                 },
             ]);
         }
@@ -381,7 +386,10 @@ const PhotoEditor = ({
     const handleMouseUp = (e) => {
         setIsDragging(false);
         setIsDrawing(false);
-        if (selectedTool === 'rect' && newAnnotation.length === 1) {
+        if (
+            (selectedTool === 'rect' || selectedTool === 'circle') &&
+            newAnnotation.length === 1
+        ) {
             const sx = newAnnotation[0].x;
             const sy = newAnnotation[0].y;
             const stage = stageRef.current;
@@ -398,6 +406,7 @@ const PhotoEditor = ({
                 color: drawColor,
                 key: annotations.length + 1,
                 size: drawingSize,
+                tool: selectedTool,
             };
             annotations.push(annotationToAdd);
             setNewAnnotation([]);

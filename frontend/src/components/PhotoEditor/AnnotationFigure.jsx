@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Rect, Transformer } from 'react-konva';
+import { Rect, Circle, Transformer } from 'react-konva';
 
 const AnnotationFigure = ({ value, selectedTool, brushType, color }) => {
     const shapeRef = useRef();
@@ -72,22 +72,48 @@ const AnnotationFigure = ({ value, selectedTool, brushType, color }) => {
         node.scaleY(1);
     };
 
+    const renderShape = () => {
+        if (value.tool === 'rect') {
+            return (
+                <Rect
+                    x={value.x}
+                    y={value.y}
+                    width={value.width}
+                    height={value.height}
+                    fill={value.fill}
+                    stroke={value.color}
+                    strokeWidth={value.size}
+                    ref={shapeRef}
+                    onClick={handleSelect}
+                    draggable={isSelected}
+                    onDragEnd={handleTransform}
+                    onTransformEnd={handleTransform}
+                />
+            );
+        } else if (value.tool === 'circle') {
+            const radius = Math.max(value.width / 2, 5);
+            return (
+                <Circle
+                    x={value.x}
+                    y={value.y}
+                    radius={radius}
+                    fill={value.fill}
+                    stroke={value.color}
+                    strokeWidth={value.size}
+                    ref={shapeRef}
+                    onClick={handleSelect}
+                    draggable={isSelected}
+                    onDragEnd={handleTransform}
+                    onTransformEnd={handleTransform}
+                />
+            );
+        }
+        return null;
+    };
+
     return (
         <>
-            <Rect
-                x={value.x}
-                y={value.y}
-                width={value.width}
-                height={value.height}
-                fill={value.fill}
-                stroke={value.color}
-                strokeWidth={value.size}
-                ref={shapeRef}
-                onClick={handleSelect}
-                draggable={isSelected}
-                onDragEnd={handleTransform}
-                onTransformEnd={handleTransform}
-            />
+            {renderShape()}
             {isSelected && (
                 <Transformer
                     ref={transformerRef}

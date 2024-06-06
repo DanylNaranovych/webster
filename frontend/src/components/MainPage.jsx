@@ -59,6 +59,10 @@ const MainPage = () => {
         setImageSize(newSize);
     };
 
+    const handleSaveLines = (newLines) => {
+        setLines(newLines);
+    };
+
     const handleScaleChange = (newScale) => {
         setScale(newScale);
     };
@@ -80,6 +84,7 @@ const MainPage = () => {
             setBrushType(null);
         }
         setSelectedTool(mode);
+        serializeData();
     };
 
     const handleSelectText = (index) => {
@@ -155,6 +160,42 @@ const MainPage = () => {
         tempContainer.remove();
     };
 
+    const serializeData = () => {
+        const data = {
+            imageSize: {
+                width: imageSize.width,
+                height: imageSize.height,
+            },
+            image: image.src, // assuming `image` is an HTMLImageElement
+            lines: lines.map((line) => ({
+                points: line.points,
+                color: line.color,
+                drawingSize: line.drawingSize,
+            })),
+            texts: texts.map((textData) => ({
+                x: textData.x,
+                y: textData.y,
+                text: textData.text,
+                fontSize: textData.fontSize,
+                fontFamily: textData.fontFamily,
+                color: textData.color,
+            })),
+            figures: figures.map((figure) => ({
+                x: figure.x,
+                y: figure.y,
+                width: figure.width,
+                height: figure.height,
+                fill: figure.fill,
+                color: figure.color,
+                size: figure.size,
+            })),
+        };
+
+        const jsonData = JSON.stringify(data, null, 2); // добавляем форматирование для лучшей читаемости
+        console.log(jsonData); // выводим JSON в консоль
+        return jsonData;
+    };
+
     return (
         <div>
             <Header />
@@ -169,7 +210,7 @@ const MainPage = () => {
                             drawingSize={lineSize}
                             selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
-                            onSaveLines={setLines}
+                            onSaveLines={handleSaveLines}
                             texts={texts}
                             setTexts={setTexts}
                             annotations={figures}
