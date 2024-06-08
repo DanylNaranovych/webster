@@ -8,6 +8,8 @@ import EditableText from './EditableText';
 import ImageControls from './ImageControls';
 import AnnotationFigure from './AnnotationFigure';
 import styles from '../../styles/PhotoEditor.module.css';
+import Konva from 'konva';
+
 
 const PhotoEditor = ({
     onImageSizeChange,
@@ -40,8 +42,10 @@ const PhotoEditor = ({
     const [lines, setLines] = useState([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
-    const [previousValues, setPreviousValues] = useState(effectsValues);
+    // const [previousValues, setPreviousValues] = useState(effectsValues);
     const [newAnnotation, setNewAnnotation] = useState([]);
+
+    const filters = [];
 
     const handleDeleteImage = () => {
         setImageSrc(null);
@@ -122,17 +126,27 @@ const PhotoEditor = ({
     }, [selectedImage]);
 
     useEffect(() => {
-        if (effectsValues) {
-            Object.keys(effectsValues).forEach((key) => {
-                if (effectsValues[key] !== previousValues[key]) {
-                    console.log(
-                        `Effect parameter "${key}" changed from ${previousValues[key]} to ${effectsValues[key]}`,
-                    );
-                    // Handle the change as needed
-                }
-            });
+        if (effectsValues && image) {
+            if (effectsValues.brightness !== 0) {
+                filters.push(Konva.Filters.Brighten);
+                imageRef.current.brightness(effectsValues.brightness);
+            }
+            if (effectsValues.contrast !== 0) {
+                filters.push(Konva.Filters.Contrast);
+                imageRef.current.contrast(effectsValues.contrast);
+            }
+            if (effectsValues.grayscale !== 0 || effectsValues.saturate !== 0) {
+                filters.push(Konva.Filters.HSL);
+                imageRef.current.saturation(effectsValues.saturate - effectsValues.grayscale);
+            }    
+            if (effectsValues.blur !== 0) {
+                filters.push(Konva.Filters.Blur);
+                imageRef.current.blurRadius(effectsValues.blur);
+            }
 
-            setPreviousValues(effectsValues);
+            imageRef.current.cache();
+            imageRef.current.filters(filters);
+            // setPreviousValues(effectsValues);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectsValues]);

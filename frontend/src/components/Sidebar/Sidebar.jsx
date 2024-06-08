@@ -82,87 +82,103 @@ const Sidebar = ({
                             <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={renderTooltip('Select')}
+                                    overlay={renderTooltip('Brightness')}
                                 >
                                     <Form.Group className="me-3">
                                         <Form.Label>Brightness</Form.Label>
                                         <Form.Range
-                                            min="0"
-                                            max="100"
-                                            step="5"
-                                            value={effectsValues.brightness}
-                                            onChange={(e) =>
-                                                onEffectsValuesChange(
-                                                    'brightness',
-                                                    e.target.value,
-                                                )
+                                            min="-1"
+                                            max="1"
+                                            step="0.05"
+                                            defaultValue={effectsValues.brightness}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange('brightness', e.target.value)
+                                            }
+                                            onTouchEnd={(e) =>
+                                                onEffectsValuesChange('brightness', e.target.value)
                                             }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
+                            </div>
+                        </Nav.Item>
+                        <Nav.Item className="mb-3">
+                            <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={renderTooltip('Draw')}
+                                    overlay={renderTooltip('Contrast')}
                                 >
                                     <Form.Group className="me-3">
                                         <Form.Label>Contrast</Form.Label>
                                         <Form.Range
-                                            min="0"
-                                            max="100"
-                                            step="5"
-                                            value={effectsValues.contrast}
-                                            onChange={(e) =>
-                                                onEffectsValuesChange(
-                                                    'contrast',
-                                                    e.target.value,
-                                                )
+                                            min="-10"
+                                            max="10"
+                                            step="0.05"
+                                            defaultValue={effectsValues.contrast}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange('contrast', e.target.value)
+                                            }
+                                            onTouchEnd={(e) =>
+                                                onEffectsValuesChange('contrast', e.target.value)
                                             }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
+                            </div>
+                        </Nav.Item>
+                        <Nav.Item className="mb-3">
+                            <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={renderTooltip('Erase')}
+                                    overlay={renderTooltip('Grayscale')}
                                 >
                                     <Form.Group className="me-3">
                                         <Form.Label>Grayscale</Form.Label>
                                         <Form.Range
-                                            min="0"
-                                            max="100"
-                                            step="5"
-                                            value={effectsValues.grayscale}
-                                            onChange={(e) =>
-                                                onEffectsValuesChange(
-                                                    'grayscale',
-                                                    e.target.value,
-                                                )
+                                            min="1"
+                                            max="7"
+                                            step="0.05"
+                                            defaultValue={effectsValues.grayscale}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange('grayscale', e.target.value)
+                                            }
+                                            onTouchEnd={(e) =>
+                                                onEffectsValuesChange('grayscale', e.target.value)
                                             }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
+                            </div>
+                        </Nav.Item>
+                        <Nav.Item className="mb-3">
+                            <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={renderTooltip('Text')}
+                                    overlay={renderTooltip('Saturate')}
                                 >
                                     <Form.Group className="me-3">
                                         <Form.Label>Saturate</Form.Label>
                                         <Form.Range
-                                            min="0"
-                                            max="100"
-                                            step="5"
-                                            value={effectsValues.saturate}
-                                            onChange={(e) =>
-                                                onEffectsValuesChange(
-                                                    'saturate',
-                                                    e.target.value,
-                                                )
+                                            min="-2"
+                                            max="2"
+                                            step="0.05"
+                                            defaultValue={effectsValues.saturate}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange('saturate', e.target.value)
+                                            }
+                                            onTouchEnd={(e) =>
+                                                onEffectsValuesChange('saturate', e.target.value)
                                             }
                                         />
                                     </Form.Group>
                                 </OverlayTrigger>
+                            </div>
+                        </Nav.Item>
+                        <Nav.Item className="mb-3">
+                            <div className="d-flex align-items-center">
                                 <OverlayTrigger
                                     placement="top"
-                                    overlay={renderTooltip('Rectangle')}
+                                    overlay={renderTooltip('Blur')}
                                 >
                                     <Form.Group className="me-3">
                                         <Form.Label>Blur</Form.Label>
@@ -170,12 +186,12 @@ const Sidebar = ({
                                             min="0"
                                             max="100"
                                             step="5"
-                                            value={effectsValues.blur}
-                                            onChange={(e) =>
-                                                onEffectsValuesChange(
-                                                    'blur',
-                                                    e.target.value,
-                                                )
+                                            defaultValue={effectsValues.blur}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange('blur', e.target.value)
+                                            }
+                                            onTouchEnd={(e) =>
+                                                onEffectsValuesChange('blur', e.target.value)
                                             }
                                         />
                                     </Form.Group>
@@ -185,6 +201,7 @@ const Sidebar = ({
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
+
 
             <Accordion className="mt-1">
                 <Accordion.Item eventKey="0">
@@ -367,9 +384,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 5 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 5 ? 'active' : ''
+                                            }`}
                                         onClick={() => handleBrushSizeChange(5)}
                                     >
                                         <span style={{ fontSize: '14px' }}>
@@ -383,9 +399,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 10 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 10 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(10)
                                         }
@@ -401,9 +416,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 15 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 15 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(15)
                                         }
@@ -419,9 +433,8 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${
-                                            brushSize === 20 ? 'active' : ''
-                                        }`}
+                                        className={`mr-2 ${brushSize === 20 ? 'active' : ''
+                                            }`}
                                         onClick={() =>
                                             handleBrushSizeChange(20)
                                         }

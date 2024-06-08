@@ -46,7 +46,7 @@ const MainPage = () => {
     const handleEffectsValuesChange = (effect, value) => {
         setEffectsValues((prevValues) => ({
             ...prevValues,
-            [effect]: value,
+            [effect]: Number(value),
         }));
     };
 
@@ -108,6 +108,28 @@ const MainPage = () => {
             width: imageSize.width,
             height: imageSize.height,
         });
+
+        tempImage.cache();
+        const filters = [];
+
+        if (effectsValues.brightness !== 0) {
+            filters.push(Konva.Filters.Brighten);
+            tempImage.brightness(effectsValues.brightness);
+        }
+        if (effectsValues.contrast !== 0) {
+            filters.push(Konva.Filters.Contrast);
+            tempImage.contrast(effectsValues.contrast);
+        }
+        if (effectsValues.grayscale !== 0 || effectsValues.saturate !== 0) {
+            filters.push(Konva.Filters.HSL);
+            tempImage.saturation(effectsValues.saturate - effectsValues.grayscale);
+        }
+        if (effectsValues.blur !== 0) {
+            filters.push(Konva.Filters.Blur);
+            tempImage.blurRadius(effectsValues.blur);
+        }
+
+        tempImage.filters(filters);
 
         tempLayer.add(tempImage);
 
