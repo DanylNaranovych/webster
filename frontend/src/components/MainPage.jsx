@@ -84,7 +84,6 @@ const MainPage = () => {
             setBrushType(null);
         }
         setSelectedTool(mode);
-        serializeData();
     };
 
     const handleSelectText = (index) => {
@@ -122,7 +121,9 @@ const MainPage = () => {
         }
         if (effectsValues.grayscale !== 0 || effectsValues.saturate !== 0) {
             filters.push(Konva.Filters.HSL);
-            tempImage.saturation(effectsValues.saturate - effectsValues.grayscale);
+            tempImage.saturation(
+                effectsValues.saturate - effectsValues.grayscale,
+            );
         }
         if (effectsValues.blur !== 0) {
             filters.push(Konva.Filters.Blur);
@@ -182,48 +183,48 @@ const MainPage = () => {
         tempContainer.remove();
     };
 
-    const serializeData = () => {
-        const data = {
-            imageSize: {
-                width: imageSize.width,
-                height: imageSize.height,
-            },
-            image: image.src,
-            lines: lines.map((line) => ({
-                points: line.points,
-                color: line.color,
-                drawingSize: line.drawingSize,
-            })),
-            texts: texts.map((textData) => ({
-                x: textData.x,
-                y: textData.y,
-                text: textData.text,
-                fontSize: textData.fontSize,
-                fontFamily: textData.fontFamily,
-                color: textData.color,
-            })),
-            figures: figures.map((figure) => ({
-                x: figure.x,
-                y: figure.y,
-                width: figure.width,
-                height: figure.height,
-                fill: figure.fill,
-                color: figure.color,
-                size: figure.size,
-            })),
-        };
+    // const serializeData = () => {
+    //     const data = {
+    //         imageSize: {
+    //             width: imageSize.width,
+    //             height: imageSize.height,
+    //         },
+    //         image: image.src,
+    //         lines: lines.map((line) => ({
+    //             points: line.points,
+    //             color: line.color,
+    //             drawingSize: line.drawingSize,
+    //         })),
+    //         texts: texts.map((textData) => ({
+    //             x: textData.x,
+    //             y: textData.y,
+    //             text: textData.text,
+    //             fontSize: textData.fontSize,
+    //             fontFamily: textData.fontFamily,
+    //             color: textData.color,
+    //         })),
+    //         figures: figures.map((figure) => ({
+    //             x: figure.x,
+    //             y: figure.y,
+    //             width: figure.width,
+    //             height: figure.height,
+    //             fill: figure.fill,
+    //             color: figure.color,
+    //             size: figure.size,
+    //         })),
+    //     };
 
-        const jsonData = JSON.stringify(data, null, 2);
-        console.log(jsonData);
-        return jsonData;
-    };
+    //     const jsonData = JSON.stringify(data, null, 2);
+    //     console.log(jsonData);
+    //     return jsonData;
+    // };
 
     return (
         <div>
             <Header />
             <Container fluid>
                 <Row>
-                    <Col xs={9} className={styles.col}>
+                    <Col xs={9} className={styles.col} style={{ padding: 0 }}>
                         <PhotoEditor
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
@@ -244,7 +245,7 @@ const MainPage = () => {
                         />
                     </Col>
 
-                    <Col xs={3} className={styles.col}>
+                    <Col xs={3} className={styles.col} style={{ padding: 0 }}>
                         <div
                             style={{
                                 height: '95vh',
