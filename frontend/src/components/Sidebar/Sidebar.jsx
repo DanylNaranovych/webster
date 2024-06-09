@@ -34,6 +34,7 @@ const Sidebar = ({
     onSelectedText,
     selectedTool,
     onUpdateText,
+    onDeleteText,
     texts,
     effectsValues,
     onEffectsValuesChange,
@@ -554,6 +555,7 @@ const Sidebar = ({
                 selectedText={selectedText}
                 handleTextSelection={handleTextSelection}
                 onUpdateText={handleUpdateText}
+                onDeleteText={onDeleteText}
             />
             <Nav.Item className="mt-3">
                 <Button variant="primary" onClick={handleSaveClick}>

@@ -27,6 +27,16 @@ const MainPage = () => {
         blur: 0,
     });
 
+    const handleDeleteFigure = (id) => {
+        setFigures(figures.filter((figure) => figure.key !== id));
+    };
+
+    const handleDeleteText = (textId) => {
+        setTexts((prevTexts) =>
+            prevTexts.filter((textItem) => textItem.id !== textId),
+        );
+    };
+
     const handleUpdateText = (color, fontSize, selectedTextId) => {
         if (selectedTextId) {
             const updatedTexts = texts.map((text) => {
@@ -238,6 +248,7 @@ const MainPage = () => {
                             setTexts={setTexts}
                             annotations={figures}
                             setAnnotations={setFigures}
+                            deleteAnnotation={handleDeleteFigure}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}
                             effectsValues={effectsValues}
@@ -263,6 +274,7 @@ const MainPage = () => {
                                 selectedText={selectedText}
                                 onSelectedText={handleSelectText}
                                 onUpdateText={handleUpdateText}
+                                onDeleteText={handleDeleteText}
                                 effectsValues={effectsValues}
                                 onEffectsValuesChange={
                                     handleEffectsValuesChange

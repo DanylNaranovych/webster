@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Accordion,
     Button,
@@ -15,11 +15,26 @@ const TextItemsList = ({
     selectedText,
     handleTextSelection,
     onUpdateText,
+    onDeleteText,
 }) => {
     const [showModal, setShowModal] = useState(false);
     const [newColor, setNewColor] = useState('');
     const [newFontSize, setNewFontSize] = useState('');
     const [selectedTextId, setSelectedTextId] = useState(null);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Delete' && selectedText !== null) {
+                onDeleteText(selectedText);
+                handleTextSelection(null);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedText, onDeleteText, handleTextSelection]);
 
     const handleChange = (textId) => {
         setSelectedTextId(textId);
@@ -56,6 +71,7 @@ const TextItemsList = ({
                                 </div>
                             )}
                         </Form.Label>
+                        {console.log(selectedText)}
                         <ListGroup>
                             {texts.map((textItem, index) => (
                                 <ListGroup.Item
