@@ -1,37 +1,52 @@
 import React, { useState } from 'react';
-import {
-    Navbar,
-    Nav,
-    Container,
-    Button,
-    Modal,
-    Form,
-    Dropdown,
-} from 'react-bootstrap';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { login, logout, registration } from '../../store/actions/auth';
+import LoginModal from './LoginModal';
+import Message from '../Message';
 import styles from '../../styles/Header.module.css';
 
 const Header = () => {
+    const dispatch = useDispatch();
     const [show, setShow] = useState(false);
-    const [isLogin, setIsLogin] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user] = useState({
-        name: 'John Doe',
-        avatar: 'https://w7.pngwing.com/pngs/205/731/png-transparent-default-avatar-thumbnail.png',
-    });
+    const [showMessage, setShowMessage] = useState(false);
+
+    const user = useSelector((state) => state.auth.user);
+    const message = useSelector((state) => state.auth.message);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const toggleForm = () => setIsLogin(!isLogin);
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        setIsLoggedIn(true);
+    const handleLogin = (name, password) => {
+        dispatch(login(name, password));
         handleClose();
     };
 
+    const handleCloseMessage = () => setShowMessage(false);
+
+    const handleRegister = (
+        email,
+        password,
+        confirmationPassword,
+        name,
+        full_name,
+    ) => {
+        dispatch(
+            registration(
+                email,
+                password,
+                confirmationPassword,
+                name,
+                full_name,
+            ),
+        ).then(() => {
+            setShowMessage(true);
+            handleClose();
+        });
+    };
+
     const handleLogout = () => {
-        setIsLoggedIn(false);
+        dispatch(logout());
     };
 
     return (
@@ -62,18 +77,18 @@ const Header = () => {
                                 Contact
                             </Nav.Link>
                         </Nav>
-                        {isLoggedIn ? (
+                        {user ? (
                             <Dropdown
                                 align="end"
                                 className={styles.userDropdown}
                             >
                                 <Dropdown.Toggle className={styles.userButton}>
                                     <img
-                                        src={user.avatar}
+                                        src="https://innostudio.de/fileuploader/images/default-avatar.png"
                                         alt="User Avatar"
                                         className={styles.userAvatar}
                                     />
-                                    {user.name}
+                                    {user.login}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item
@@ -107,103 +122,20 @@ const Header = () => {
                             </Button>
                         )}
                     </Navbar.Collapse>
+                    <Message
+                        message={message}
+                        onClose={handleCloseMessage}
+                        show={showMessage}
+                    />
                 </Container>
             </Navbar>
 
-            <Modal show={show} onHide={handleClose} centered>
-                <Modal.Header closeButton className={styles.modalHeader}>
-                    <Modal.Title>{isLogin ? 'Log In' : 'Register'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className={styles.modalBody}>
-                    <Form onSubmit={handleLogin}>
-                        {isLogin ? (
-                            <>
-                                <Form.Group
-                                    controlId="formBasicEmail"
-                                    className={styles.formGroup}
-                                >
-                                    <Form.Label>Email address</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        placeholder="Enter email"
-                                        className={styles.formControl}
-                                    />
-                                </Form.Group>
-                                <Form.Group
-                                    controlId="formBasicPassword"
-                                    className={styles.formGroup}
-                                >
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Password"
-                                        className={styles.formControl}
-                                    />
-                                </Form.Group>
-                                <Button
-                                    variant="primary"
-                                    type="submit"
-                                    className={styles.submitButton}
-                                >
-                                    Log In
-                                </Button>
-                            </>
-                        ) : (
-                            <>
-                                <Form.Group
-                                    controlId="formBasicEmail"
-                                    className={styles.formGroup}
-                                >
-                                    <Form.Label>Email address</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        placeholder="Enter email"
-                                        className={styles.formControl}
-                                    />
-                                </Form.Group>
-                                <Form.Group
-                                    controlId="formBasicPassword"
-                                    className={styles.formGroup}
-                                >
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Password"
-                                        className={styles.formControl}
-                                    />
-                                </Form.Group>
-                                <Form.Group
-                                    controlId="formBasicConfirmPassword"
-                                    className={styles.formGroup}
-                                >
-                                    <Form.Label>Confirm Password</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Confirm Password"
-                                        className={styles.formControl}
-                                    />
-                                </Form.Group>
-                                <Button
-                                    variant="primary"
-                                    type="submit"
-                                    className={styles.submitButton}
-                                >
-                                    Register
-                                </Button>
-                            </>
-                        )}
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer className={styles.modalFooter}>
-                    <Button
-                        variant="secondary"
-                        onClick={toggleForm}
-                        className={styles.toggleButton}
-                    >
-                        {isLogin ? 'Switch to Register' : 'Switch to Log In'}
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <LoginModal
+                show={show}
+                handleClose={handleClose}
+                handleLogin={handleLogin}
+                handleRegister={handleRegister}
+            />
         </>
     );
 };

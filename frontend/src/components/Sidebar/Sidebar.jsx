@@ -7,6 +7,7 @@ import {
     OverlayTrigger,
     Tooltip,
 } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { SketchPicker, SwatchesPicker } from 'react-color';
 import { AiOutlineSelect } from 'react-icons/ai';
 import { BiText } from 'react-icons/bi';
@@ -21,12 +22,15 @@ import {
 } from 'react-icons/fa';
 
 import TextItemsList from './TextItemsList';
+import SaveModal from './SaveModal';
 
 import styles from '../../styles/Sidebar.module.css';
 
 const Sidebar = ({
     color,
+    image,
     onSaveImage,
+    onSaveImageToServer,
     onToolChange,
     onColorChange,
     onBrushSizeChange,
@@ -34,6 +38,7 @@ const Sidebar = ({
     onSelectedText,
     selectedTool,
     onUpdateText,
+    onDeleteText,
     texts,
     effectsValues,
     onEffectsValuesChange,
@@ -42,9 +47,15 @@ const Sidebar = ({
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
+    const [modalOpen, setModalOpen] = useState(false);
+    const user = useSelector((state) => state.auth.user);
 
     const handleSaveClick = () => {
         onSaveImage();
+    };
+
+    const toggleModal = () => {
+        setModalOpen(!modalOpen);
     };
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
@@ -90,12 +101,20 @@ const Sidebar = ({
                                             min="-1"
                                             max="1"
                                             step="0.05"
-                                            defaultValue={effectsValues.brightness}
+                                            defaultValue={
+                                                effectsValues.brightness
+                                            }
                                             onMouseUp={(e) =>
-                                                onEffectsValuesChange('brightness', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'brightness',
+                                                    e.target.value,
+                                                )
                                             }
                                             onTouchEnd={(e) =>
-                                                onEffectsValuesChange('brightness', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'brightness',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                     </Form.Group>
@@ -114,12 +133,20 @@ const Sidebar = ({
                                             min="-10"
                                             max="10"
                                             step="0.05"
-                                            defaultValue={effectsValues.contrast}
+                                            defaultValue={
+                                                effectsValues.contrast
+                                            }
                                             onMouseUp={(e) =>
-                                                onEffectsValuesChange('contrast', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'contrast',
+                                                    e.target.value,
+                                                )
                                             }
                                             onTouchEnd={(e) =>
-                                                onEffectsValuesChange('contrast', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'contrast',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                     </Form.Group>
@@ -138,12 +165,20 @@ const Sidebar = ({
                                             min="1"
                                             max="7"
                                             step="0.05"
-                                            defaultValue={effectsValues.grayscale}
+                                            defaultValue={
+                                                effectsValues.grayscale
+                                            }
                                             onMouseUp={(e) =>
-                                                onEffectsValuesChange('grayscale', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'grayscale',
+                                                    e.target.value,
+                                                )
                                             }
                                             onTouchEnd={(e) =>
-                                                onEffectsValuesChange('grayscale', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'grayscale',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                     </Form.Group>
@@ -162,12 +197,20 @@ const Sidebar = ({
                                             min="-2"
                                             max="2"
                                             step="0.05"
-                                            defaultValue={effectsValues.saturate}
+                                            defaultValue={
+                                                effectsValues.saturate
+                                            }
                                             onMouseUp={(e) =>
-                                                onEffectsValuesChange('saturate', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'saturate',
+                                                    e.target.value,
+                                                )
                                             }
                                             onTouchEnd={(e) =>
-                                                onEffectsValuesChange('saturate', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'saturate',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                     </Form.Group>
@@ -188,10 +231,16 @@ const Sidebar = ({
                                             step="5"
                                             defaultValue={effectsValues.blur}
                                             onMouseUp={(e) =>
-                                                onEffectsValuesChange('blur', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'blur',
+                                                    e.target.value,
+                                                )
                                             }
                                             onTouchEnd={(e) =>
-                                                onEffectsValuesChange('blur', e.target.value)
+                                                onEffectsValuesChange(
+                                                    'blur',
+                                                    e.target.value,
+                                                )
                                             }
                                         />
                                     </Form.Group>
@@ -201,7 +250,6 @@ const Sidebar = ({
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
-
 
             <Accordion className="mt-1">
                 <Accordion.Item eventKey="0">
@@ -384,8 +432,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 5 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 5 ? 'active' : ''
+                                        }`}
                                         onClick={() => handleBrushSizeChange(5)}
                                     >
                                         <span style={{ fontSize: '14px' }}>
@@ -399,8 +448,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 10 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 10 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(10)
                                         }
@@ -416,8 +466,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 15 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 15 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(15)
                                         }
@@ -433,8 +484,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 20 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 20 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(20)
                                         }
@@ -513,12 +565,35 @@ const Sidebar = ({
                 selectedText={selectedText}
                 handleTextSelection={handleTextSelection}
                 onUpdateText={handleUpdateText}
+                onDeleteText={onDeleteText}
             />
-            <Nav.Item className="mt-3">
-                <Button variant="primary" onClick={handleSaveClick}>
-                    Save Image
-                </Button>
-            </Nav.Item>
+            {image && (
+                <Nav.Item className="mt-3 d-flex align-items-center">
+                    <Button
+                        variant="primary"
+                        className="mx-1"
+                        onClick={handleSaveClick}
+                    >
+                        Save Image
+                    </Button>
+                    {user && (
+                        <div>
+                            <Button
+                                variant="primary"
+                                className="mx-1"
+                                onClick={toggleModal}
+                            >
+                                Save To Library
+                            </Button>
+                            <SaveModal
+                                show={modalOpen}
+                                handleSave={onSaveImageToServer}
+                                handleClose={toggleModal}
+                            />
+                        </div>
+                    )}
+                </Nav.Item>
+            )}
         </Nav>
     );
 };
