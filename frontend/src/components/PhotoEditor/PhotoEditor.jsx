@@ -42,7 +42,6 @@ const PhotoEditor = ({
     const [lines, setLines] = useState([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
-    // const [previousValues, setPreviousValues] = useState(effectsValues);
     const [newAnnotation, setNewAnnotation] = useState([]);
 
     const filters = [];
@@ -148,7 +147,6 @@ const PhotoEditor = ({
 
             imageRef.current.cache();
             imageRef.current.filters(filters);
-            // setPreviousValues(effectsValues);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectsValues]);

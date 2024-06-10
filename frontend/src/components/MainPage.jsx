@@ -19,6 +19,7 @@ const MainPage = () => {
     const [selectedTool, setSelectedTool] = useState('select');
     const [brushType, setBrushType] = useState('pencil');
     const [color, setColor] = useState('#000');
+    const [historyStep, setHistoryStep] = useState(0);
     const [effectsValues, setEffectsValues] = useState({
         brightness: 0,
         contrast: 0,
@@ -26,6 +27,15 @@ const MainPage = () => {
         saturate: 0,
         blur: 0,
     });
+    const [history, setHistory] = useState([{
+        effectsValues: {
+            brightness: 0,
+            contrast: 0,
+            grayscale: 0,
+            saturate: 0,
+            blur: 0,
+        }
+    }]);
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
@@ -68,11 +78,19 @@ const MainPage = () => {
         }
     };
 
+    const addEffectsToHistory = (newEffectsValues) => {
+        const newHistory = [...history.slice(0, historyStep + 1), { effectsValues: newEffectsValues }];
+        setHistory(newHistory);
+        setHistoryStep(historyStep + 1);
+    };
+
     const handleEffectsValuesChange = (effect, value) => {
-        setEffectsValues((prevValues) => ({
-            ...prevValues,
+        const newEffectsValues = {
+            ...effectsValues,
             [effect]: Number(value),
-        }));
+        };
+        setEffectsValues(newEffectsValues);
+        addEffectsToHistory(newEffectsValues);
     };
 
     const handleChangeBrushType = (brushType) => {
@@ -206,6 +224,22 @@ const MainPage = () => {
 
         tempLayer.destroy();
         tempContainer.remove();
+    };
+
+    const handleUndo = () => {
+        if (historyStep === 0) {
+            return;
+        }
+        setHistoryStep(historyStep - 1);
+        setEffectsValues(history[historyStep - 1].effectsValues);
+    };
+
+    const handleRedo = () => {
+        if (historyStep === history.length - 1) {
+            return;
+        }
+        setHistoryStep(historyStep + 1);
+        setEffectsValues(history[historyStep + 1].effectsValues);
     };
 
     // const serializeData = () => {
@@ -351,6 +385,8 @@ const MainPage = () => {
                                 }
                                 brushType={brushType}
                                 onChangeBrushType={handleChangeBrushType}
+                                onUndo={handleUndo}
+                                onRedo={handleRedo}
                             />
                         </div>
                     </Col>
