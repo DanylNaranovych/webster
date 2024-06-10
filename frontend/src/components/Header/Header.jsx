@@ -11,7 +11,12 @@ const Header = () => {
     const [show, setShow] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
 
-    const user = useSelector((state) => state.auth.user);
+    // const user = useSelector((state) => state.auth.user);
+    const user = {
+        name: 'Xanzik',
+        avatar: 'https://innostudio.de/fileuploader/images/default-avatar.png',
+    };
+
     const message = useSelector((state) => state.auth.message);
 
     const handleClose = () => setShow(false);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Konva from 'konva';
 import { Container, Row, Col } from 'react-bootstrap';
 import styles from '../styles/MainPage.module.css';
@@ -26,6 +26,21 @@ const MainPage = () => {
         saturate: 0,
         blur: 0,
     });
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            const message =
+                'У вас есть несохраненные данные. Вы уверены, что хотите покинуть эту страницу?';
+            event.returnValue = message;
+            return message;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
 
     const handleDeleteFigure = (id) => {
         setFigures(figures.filter((figure) => figure.key !== id));
@@ -148,7 +163,7 @@ const MainPage = () => {
             const tempLine = new Konva.Line({
                 points: line.points,
                 stroke: line.color,
-                strokeWidth: line.drawingSize,
+                strokeWidth: line.size,
             });
             tempLayer.add(tempLine);
         });
@@ -199,13 +214,15 @@ const MainPage = () => {
     //             width: imageSize.width,
     //             height: imageSize.height,
     //         },
-    //         image: image.src,
+
     //         lines: lines.map((line) => ({
     //             points: line.points,
     //             color: line.color,
-    //             drawingSize: line.drawingSize,
+    //             size: line.size,
     //         })),
+
     //         texts: texts.map((textData) => ({
+    //             id: textData.id,
     //             x: textData.x,
     //             y: textData.y,
     //             text: textData.text,
@@ -213,20 +230,73 @@ const MainPage = () => {
     //             fontFamily: textData.fontFamily,
     //             color: textData.color,
     //         })),
+
     //         figures: figures.map((figure) => ({
+    //             id: figure.key,
     //             x: figure.x,
     //             y: figure.y,
+    //             tool: figure.tool,
     //             width: figure.width,
     //             height: figure.height,
     //             fill: figure.fill,
     //             color: figure.color,
     //             size: figure.size,
     //         })),
+
+    //         effectsValues: {
+    //             brightness: effectsValues.brightness,
+    //             contrast: effectsValues.contrast,
+    //             grayscale: effectsValues.grayscale,
+    //             saturate: effectsValues.saturate,
+    //             blur: effectsValues.blur,
+    //         },
     //     };
 
-    //     const jsonData = JSON.stringify(data, null, 2);
-    //     console.log(jsonData);
-    //     return jsonData;
+    //     return JSON.stringify(data, null, 2);
+    // };
+
+    // const deserializeData = (jsonString) => {
+    //     const data = JSON.parse(jsonString);
+
+    //     const imageSize = {
+    //         width: data.imageSize.width,
+    //         height: data.imageSize.height,
+    //     };
+
+    //     const lines = data.lines.map((line) => ({
+    //         points: line.points,
+    //         color: line.color,
+    //         size: line.size,
+    //     }));
+
+    //     const texts = data.texts.map((textData) => ({
+    //         id: textData.id,
+    //         x: textData.x,
+    //         y: textData.y,
+    //         text: textData.text,
+    //         fontSize: textData.fontSize,
+    //         fontFamily: textData.fontFamily,
+    //         color: textData.color,
+    //     }));
+
+    //     const figures = data.figures.map((figure) => ({
+    //         key: figure.id,
+    //         x: figure.x,
+    //         y: figure.y,
+    //         tool: figure.tool,
+    //         width: figure.width,
+    //         height: figure.height,
+    //         fill: figure.fill,
+    //         color: figure.color,
+    //         size: figure.size,
+    //     }));
+
+    //     return {
+    //         imageSize,
+    //         lines,
+    //         texts,
+    //         figures,
+    //     };
     // };
 
     return (
