@@ -7,16 +7,12 @@ import ArtworkService from "../services/artwork.service.js";
 const artwork = prisma.artwork;
 
 class artworkController {
-     getEvents = async(req, res) => {
-        const companyId = req.query.companyId;
+     getArtworks = async(req, res) => {
+         const authorId = req.user.id;
 
-        let eventsArray;
-        if(companyId)
-            eventsArray = await artwork.getAllCompanyEvents(companyId);
-        else
-            eventsArray = await artwork.getAll();
+        const artworksArray = await ArtworkService.readAll(authorId);
 
-        res.status(200).json({ eventsArray });
+        res.status(200).json({ artworksArray });
     }
 
     async createArtwork(req, res) {

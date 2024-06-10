@@ -24,6 +24,21 @@ const ArtworkService = {
         return found;
     },
 
+    async readAll(authorId) {
+        return artwork.findMany({
+            where: {
+                authorId,
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                authorId: true,
+                createdAt: true,
+            },
+        });
+    },
+
     async update(artwork_id, user_id, data) {
         await this.read(artwork_id, user_id);
 

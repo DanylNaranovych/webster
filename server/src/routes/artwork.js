@@ -9,6 +9,7 @@ const router = express.Router();
 //
 router.use(TokenService.authCheck);
 
+router.get("/", boundary(controller.getArtworks));
 router.post("/", boundary(controller.createArtwork));
 router.get('/:id', boundary(controller.getArtwork));
 router.put('/:id', boundary(controller.updateArtwork));
