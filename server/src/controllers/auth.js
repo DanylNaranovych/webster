@@ -9,7 +9,7 @@ class authController {
 
     async login(req, res) {
         if (req.cookies.token) { // relocate to middleware with Joi things
-            jsonwebtoken.verify(req.cookies.token, process.env.COOKIE_SECRET, (err) => {
+            jsonwebtoken.verify(req.cookies.token, process.env.JWT_SECRET, (err) => {
                 if (err) {
                     res.clearCookie("token").sendStatus(401);
                 }

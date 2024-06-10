@@ -1,3 +1,3 @@
 export const COOKIE_OPTIONS = {
-	expiresIn: process.env.COOKIE_LIFE,
+	expiresIn: process.env.JWT_LIFE,
 };
