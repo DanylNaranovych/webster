@@ -1,0 +1,49 @@
+{
+  "name": "webster-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API for photo editor Webster",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node --env-file .env ./src/app.js ",
+    "dev": "nodemon --env-file .env src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanylNaranovych/webster.git"
+  },
+  "keywords": [
+    "ucode",
+    "photo",
+    "editor"
+  ],
+  "author": "D. Harin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DanylNaranovych/webster/issues"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "homepage": "https://github.com/DanylNaranovych/webster#readme",
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "argon2": "^0.40.3",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.3",
+    "prisma": "^5.15.0"
+  }
+}
