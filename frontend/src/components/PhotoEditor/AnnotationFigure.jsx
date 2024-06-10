@@ -1,7 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Rect, Circle, Transformer } from 'react-konva';
 
-const AnnotationFigure = ({ value, selectedTool, brushType, color }) => {
+const AnnotationFigure = ({
+    value,
+    selectedTool,
+    brushType,
+    color,
+    onDelete,
+}) => {
     const shapeRef = useRef();
     const transformerRef = useRef();
     const [isSelected, setIsSelected] = useState(false);
@@ -32,12 +38,24 @@ const AnnotationFigure = ({ value, selectedTool, brushType, color }) => {
             }
         };
 
+        const handleKeyDown = (event) => {
+            if (
+                isSelected &&
+                (event.key === 'Delete' || event.key === 'Backspace')
+            ) {
+                onDelete(value.key);
+                setIsSelected(false);
+            }
+        };
+
         window.addEventListener('click', handleClickOutside);
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
             window.removeEventListener('click', handleClickOutside);
+            window.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
+    }, [onDelete, isSelected, value]);
 
     useEffect(() => {
         if (isSelected) {

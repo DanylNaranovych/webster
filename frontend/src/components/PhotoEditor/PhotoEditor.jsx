@@ -10,7 +10,6 @@ import AnnotationFigure from './AnnotationFigure';
 import styles from '../../styles/PhotoEditor.module.css';
 import Konva from 'konva';
 
-
 const PhotoEditor = ({
     onImageSizeChange,
     onScaleChange,
@@ -24,6 +23,7 @@ const PhotoEditor = ({
     setTexts,
     annotations,
     setAnnotations,
+    deleteAnnotation,
     selectedText,
     effectsValues,
     brushType,
@@ -137,8 +137,10 @@ const PhotoEditor = ({
             }
             if (effectsValues.grayscale !== 0 || effectsValues.saturate !== 0) {
                 filters.push(Konva.Filters.HSL);
-                imageRef.current.saturation(effectsValues.saturate - effectsValues.grayscale);
-            }    
+                imageRef.current.saturation(
+                    effectsValues.saturate - effectsValues.grayscale,
+                );
+            }
             if (effectsValues.blur !== 0) {
                 filters.push(Konva.Filters.Blur);
                 imageRef.current.blurRadius(effectsValues.blur);
@@ -510,6 +512,7 @@ const PhotoEditor = ({
                                     selectedTool={selectedTool}
                                     brushType={brushType}
                                     color={drawColor}
+                                    onDelete={deleteAnnotation}
                                 />
                             ))}
                             {selectedImage && (

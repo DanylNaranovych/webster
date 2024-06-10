@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Card, Pagination } from 'react-bootstrap';
 import styles from '../styles/ImageLibrary.module.css';
 import Header from './Header/Header';
+import DrawingComponent from './DrawingComponent';
 
 const ImageLibrary = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -9,43 +10,123 @@ const ImageLibrary = () => {
     const testImages = [
         {
             id: 1,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 1',
+            data: {
+                imageSize: {
+                    width: 800,
+                    height: 600,
+                },
+                lines: [
+                    {
+                        points: [20, 40, 200, 40, 50, 100, 50],
+                        color: 'red',
+                        size: 1,
+                    },
+                ],
+                texts: [
+                    {
+                        id: 'text1',
+                        x: 100,
+                        y: 100,
+                        text: 'Sample Text',
+                        fontSize: 18,
+                        fontFamily: 'Arial',
+                        color: 'black',
+                    },
+                ],
+                figures: [
+                    {
+                        id: 'rect1',
+                        x: 500,
+                        y: 1000,
+                        tool: 'rectangle',
+                        width: 100,
+                        height: 50,
+                        fill: 'green',
+                        color: 'blue',
+                        size: 2,
+                    },
+                ],
+            },
         },
         {
             id: 2,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 2',
+            data: {
+                imageSize: {
+                    width: 800,
+                    height: 600,
+                },
+                lines: [
+                    {
+                        points: [20, 40, 200, 40],
+                        color: 'red',
+                        size: 5,
+                    },
+                ],
+                texts: [
+                    {
+                        id: 'text1',
+                        x: 100,
+                        y: 500,
+                        text: 'Sample Text',
+                        fontSize: 18,
+                        fontFamily: 'Arial',
+                        color: 'black',
+                    },
+                ],
+                figures: [
+                    {
+                        id: 'rect1',
+                        x: 300,
+                        y: 200,
+                        tool: 'rectangle',
+                        width: 100,
+                        height: 50,
+                        fill: 'green',
+                        color: 'blue',
+                        size: 2,
+                    },
+                ],
+            },
         },
         {
             id: 3,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 3',
-        },
-        {
-            id: 4,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 4',
-        },
-        {
-            id: 5,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 5',
-        },
-        {
-            id: 6,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 6',
-        },
-        {
-            id: 7,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 7',
-        },
-        {
-            id: 8,
-            src: 'https://via.placeholder.com/150',
-            alt: 'Placeholder Image 8',
+            data: {
+                imageSize: {
+                    width: 800,
+                    height: 600,
+                },
+                lines: [
+                    {
+                        points: [20, 40, 200, 40],
+                        color: 'red',
+                        size: 5,
+                    },
+                ],
+                texts: [
+                    {
+                        id: 'text1',
+                        x: 100,
+                        y: 100,
+                        text: 'Sample Text',
+                        fontSize: 18,
+                        fontFamily: 'Arial',
+                        color: 'black',
+                    },
+                ],
+                figures: [
+                    {
+                        id: 'rect1',
+                        x: 300,
+                        y: 200,
+                        tool: 'rectangle',
+                        width: 100,
+                        height: 50,
+                        fill: 'green',
+                        color: 'blue',
+                        size: 2,
+                    },
+                ],
+            },
         },
     ];
 
@@ -64,27 +145,22 @@ const ImageLibrary = () => {
             <Header />
             <Container className={styles.imageLibrary}>
                 <Row>
-                    {currentImages &&
-                        currentImages.map((image) => (
-                            <Col
-                                key={image.id}
-                                xs={12}
-                                sm={6}
-                                md={4}
-                                lg={3}
-                                className="mb-4"
-                            >
-                                <Card className={styles.card}>
-                                    <Card.Img
-                                        variant="top"
-                                        src={image.src}
-                                        alt={image.alt}
-                                        className={styles.cardImgTop}
-                                    />
-                                </Card>
-                            </Col>
-                        ))}
+                    {currentImages.map((image) => (
+                        <Col
+                            key={image.id}
+                            xs={12}
+                            sm={6}
+                            md={4}
+                            lg={3}
+                            className="mb-4"
+                        >
+                            <Card className={styles.card}>
+                                <DrawingComponent data={image.data} />
+                            </Card>
+                        </Col>
+                    ))}
                 </Row>
+
                 <Pagination className={styles.paginationContainer}>
                     <Pagination.First
                         onClick={() => handlePageChange(1)}

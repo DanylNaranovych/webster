@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
-import Konva from 'konva';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import styles from '../styles/MainPage.module.css';
-
+import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Header from './Header/Header';
 import Sidebar from './Sidebar/Sidebar';
 import PhotoEditor from './PhotoEditor/PhotoEditor';
+import { serializeData } from '../utils/jsonUtils';
+import { createArtWork, getArtWork } from '../store/actions/artWork';
+import { handleDownload } from '../utils/saveUtils';
+import styles from '../styles/MainPage.module.css';
 
 const MainPage = () => {
+    const dispatch = useDispatch();
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
     const [image, setImage] = useState(null);
@@ -26,6 +30,38 @@ const MainPage = () => {
         saturate: 0,
         blur: 0,
     });
+    const { id } = useParams();
+
+    useEffect(() => {
+        if (id) {
+            dispatch(getArtWork(id));
+        }
+    }, [id, dispatch]);
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            const message =
+                'У вас есть несохраненные данные. Вы уверены, что хотите покинуть эту страницу?';
+            event.returnValue = message;
+            return message;
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
+    const handleDeleteFigure = (id) => {
+        setFigures(figures.filter((figure) => figure.key !== id));
+    };
+
+    const handleDeleteText = (textId) => {
+        setTexts((prevTexts) =>
+            prevTexts.filter((textItem) => textItem.id !== textId),
+        );
+    };
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
         if (selectedTextId) {
@@ -84,7 +120,6 @@ const MainPage = () => {
             setBrushType(null);
         }
         setSelectedTool(mode);
-        serializeData();
     };
 
     const handleSelectText = (index) => {
@@ -92,130 +127,34 @@ const MainPage = () => {
     };
 
     const handleSave = () => {
-        const tempContainer = document.createElement('div');
-        document.body.appendChild(tempContainer);
-
-        const tempStage = new Konva.Stage({
-            container: tempContainer,
-            width: imageSize.width,
-            height: imageSize.height,
-        });
-
-        const tempLayer = new Konva.Layer();
-
-        const tempImage = new Konva.Image({
-            image: image,
-            width: imageSize.width,
-            height: imageSize.height,
-        });
-
-        tempImage.cache();
-        const filters = [];
-
-        if (effectsValues.brightness !== 0) {
-            filters.push(Konva.Filters.Brighten);
-            tempImage.brightness(effectsValues.brightness);
+        if (image) {
+            handleDownload(
+                effectsValues,
+                lines,
+                texts,
+                figures,
+                imageSize,
+                image,
+            );
         }
-        if (effectsValues.contrast !== 0) {
-            filters.push(Konva.Filters.Contrast);
-            tempImage.contrast(effectsValues.contrast);
-        }
-        if (effectsValues.grayscale !== 0 || effectsValues.saturate !== 0) {
-            filters.push(Konva.Filters.HSL);
-            tempImage.saturation(effectsValues.saturate - effectsValues.grayscale);
-        }
-        if (effectsValues.blur !== 0) {
-            filters.push(Konva.Filters.Blur);
-            tempImage.blurRadius(effectsValues.blur);
-        }
-
-        tempImage.filters(filters);
-
-        tempLayer.add(tempImage);
-
-        lines.forEach((line) => {
-            const tempLine = new Konva.Line({
-                points: line.points,
-                stroke: line.color,
-                strokeWidth: line.drawingSize,
-            });
-            tempLayer.add(tempLine);
-        });
-
-        texts.forEach((textData) => {
-            const tempText = new Konva.Text({
-                x: textData.x,
-                y: textData.y,
-                text: textData.text,
-                fontSize: textData.fontSize,
-                fontFamily: textData.fontFamily,
-                fill: textData.color,
-            });
-            tempLayer.add(tempText);
-        });
-
-        figures.forEach((figure) => {
-            const tempText = new Konva.Rect({
-                x: figure.x,
-                y: figure.y,
-                width: figure.width,
-                height: figure.height,
-                fill: figure.fill,
-                stroke: figure.color,
-                strokeWidth: figure.size,
-            });
-            tempLayer.add(tempText);
-        });
-
-        tempStage.add(tempLayer);
-
-        const uri = tempStage.toDataURL();
-
-        const link = document.createElement('a');
-        link.href = uri;
-        link.download = 'edited_image.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        tempLayer.destroy();
-        tempContainer.remove();
     };
 
-    const serializeData = () => {
-        const data = {
-            imageSize: {
-                width: imageSize.width,
-                height: imageSize.height,
-            },
-            image: image.src,
-            lines: lines.map((line) => ({
-                points: line.points,
-                color: line.color,
-                drawingSize: line.drawingSize,
-            })),
-            texts: texts.map((textData) => ({
-                x: textData.x,
-                y: textData.y,
-                text: textData.text,
-                fontSize: textData.fontSize,
-                fontFamily: textData.fontFamily,
-                color: textData.color,
-            })),
-            figures: figures.map((figure) => ({
-                x: figure.x,
-                y: figure.y,
-                width: figure.width,
-                height: figure.height,
-                fill: figure.fill,
-                color: figure.color,
-                size: figure.size,
-            })),
-        };
-
-        const jsonData = JSON.stringify(data, null, 2);
-        console.log(jsonData);
-        return jsonData;
+    const handleSaveToServer = (name, description) => {
+        if (image) {
+            console.log(name, description);
+            const data = {
+                content: serializeData(
+                    imageSize,
+                    lines,
+                    texts,
+                    figures,
+                    effectsValues,
+                ),
+                name: name,
+                description: description,
+            };
+            dispatch(createArtWork(data));
+        }
     };
 
     return (
@@ -223,7 +162,7 @@ const MainPage = () => {
             <Header />
             <Container fluid>
                 <Row>
-                    <Col xs={9} className={styles.col}>
+                    <Col xs={9} className={styles.col} style={{ padding: 0 }}>
                         <PhotoEditor
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
@@ -237,6 +176,7 @@ const MainPage = () => {
                             setTexts={setTexts}
                             annotations={figures}
                             setAnnotations={setFigures}
+                            deleteAnnotation={handleDeleteFigure}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}
                             effectsValues={effectsValues}
@@ -244,7 +184,7 @@ const MainPage = () => {
                         />
                     </Col>
 
-                    <Col xs={3} className={styles.col}>
+                    <Col xs={3} className={styles.col} style={{ padding: 0 }}>
                         <div
                             style={{
                                 height: '95vh',
@@ -253,8 +193,10 @@ const MainPage = () => {
                         >
                             <Sidebar
                                 color={color}
+                                image={image}
                                 onColorChange={handleColorChange}
                                 onSaveImage={handleSave}
+                                onSaveImageToServer={handleSaveToServer}
                                 onBrushSizeChange={handleLineSizeChange}
                                 onToolChange={handleToolChange}
                                 selectedTool={selectedTool}
@@ -262,6 +204,7 @@ const MainPage = () => {
                                 selectedText={selectedText}
                                 onSelectedText={handleSelectText}
                                 onUpdateText={handleUpdateText}
+                                onDeleteText={handleDeleteText}
                                 effectsValues={effectsValues}
                                 onEffectsValuesChange={
                                     handleEffectsValuesChange

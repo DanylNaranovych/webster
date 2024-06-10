@@ -8,7 +8,6 @@
 
 .sidebar {
     border-left: 1px solid black;
-    height: 100vh;
 }
 
 .textItem,
@@ -26,29 +25,29 @@
     box-shadow: 0 12px 24px var(--hover-shadow-color);
 }
 
-.textItem {
-    background-color: var(--secondary-color);
+.selected {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--secondary-color) !important;
 }
 
-.selected {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--secondary-color);
+.textItem {
+    background-color: var(--secondary-color) !important;
 }
 
 .cardContent {
-    grid-template-columns: auto 1fr;
-    row-gap: 8px;
+    grid-template-columns: auto 1fr !important;
+    row-gap: 8px !important;
 }
 
 .textProperty {
-    margin-right: 15px;
+    margin-right: 15px !important;
     font-weight: bold;
     color: #333333;
 }
 
 .selected .textProperty {
-    color: var(--secondary-color);
+    color: var(--secondary-color) !important;
 }
 
 .textValue {
