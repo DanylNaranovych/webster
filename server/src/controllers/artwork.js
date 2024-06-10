@@ -19,67 +19,54 @@ class artworkController {
         res.status(200).json({ eventsArray });
     }
 
-    getArtwork = async(req, res) => {
-        const artworkId = req.params.id;
-
-        const artwork = await ArtworkService.read(artworkId);
-
-        res.status(200).json({ ...artwork, content: JSON.parse(artwork.content) });
-    }
-
-    createArtwork = async(req, res) =>  {
+    async createArtwork(req, res) {
         const artworkData = req.body;
+        const user_id = req.user.id;
 
         const { id } = await ArtworkService.create({
             ...artworkData,
-            authorId: req.user.id,
+            authorId: user_id,
         });
 
         res.status(200).json({
             id,
         });
-
     }
 
-    updateEvent = async(req, res) => {
-        const eventId = Number(req.params.id);
-        const { name, description, date, price, tickets_available, latitude, longitude, company_id, format_id, theme_id } = req.body;
+    getArtwork = async(req, res) => {
+        const artworkId = req.params.id;
 
-        if (name) {
-            if (await artwork.checkFor("name", name))
-                throw new ClientError("Event exists", 409);
-            await artwork.update(eventId, "name", name);
-        }
-        if (description) await artwork.update(eventId, "description", description);
-        if (date) await artwork.update(eventId, "date", date);
-        if (price) await artwork.update(eventId, "price", price);
-        if (tickets_available) await artwork.update(eventId, "tickets_available", tickets_available);
-        if (latitude) await artwork.update(eventId, "latitude", latitude);
-        if (longitude) await artwork.update(eventId, "longitude", longitude);
-        if (company_id) {
-            if(!await companiesTable.checkFor("id", company_id))
-                throw new ClientError("Unknown company", 404);
+        const artwork = await ArtworkService.read(artworkId, req.user.id);
 
-            await artwork.update(eventId, "company_id", company_id);
-        }
-        if (format_id) {
-            if (!await formatsTable.checkFor("id", format_id))
-                throw new ClientError("Unknown format", 409);
-            await artwork.update(eventId, "format_id", format_id);
-        }
-        if (theme_id) {
-            if (!await themesTable.checkFor("id", theme_id))
-                throw new ClientError("Unknown theme", 409);
-            await artwork.update(eventId, "theme_id", theme_id);
-        }
+        res.status(200).json({ ...artwork, content: JSON.parse(artwork.content) });
+    }
+
+    async updateArtwork(req, res) {
+        const artwork_id = req.params.id;
+        const user_id = req.user.id;
+        const data = req.body;
+
+        await ArtworkService.update(
+            artwork_id,
+            user_id,
+            {
+                ...data,
+                content: JSON.parse(data.content),
+            },
+        );
 
         res.sendStatus(201);
     }
 
-    deleteEvent = async(req, res) => {
-        const eventId = Number(req.params.id);
+     async deleteArtwork(req, res) {
+        const artwork_id = req.params.id;
+         const user_id = req.user.id;
 
-        await artwork.delete(eventId);
+         await ArtworkService.delete(
+             artwork_id,
+             user_id
+         );
+
         res.sendStatus(204);
     }
 

@@ -6,12 +6,12 @@ import { boundary } from "../middleware/error.js";
 const router = express.Router();
 
 // router.get("/", boundary(controller.getEvents));
-router.get('/:id', boundary(controller.getArtwork));
 //
 router.use(TokenService.authCheck);
-//
+
 router.post("/", boundary(controller.createArtwork));
-// router.put('/:id', checkUserEventPermissions, boundary(controller.updateEvent));
-// router.delete('/:id', checkUserEventPermissions, boundary(controller.deleteEvent));
+router.get('/:id', boundary(controller.getArtwork));
+router.put('/:id', boundary(controller.updateArtwork));
+router.delete('/:id', boundary(controller.deleteArtwork));
 
 export default router;

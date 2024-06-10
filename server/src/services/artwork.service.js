@@ -15,13 +15,33 @@ const ArtworkService = {
         return await artwork.create({ data });
     },
 
-    async read(id) {
-        const found = await artwork.findUnique({ where: { id } });
+    async read(artwork_id, user_id) {
+        const found = await artwork.findUnique({ where: { id: artwork_id } });
 
-        if(!found)
+        if(!found || found.authorId !== user_id)
             throw new ClientError("Artwork not found", 404);
 
         return found;
+    },
+
+    async update(artwork_id, user_id, data) {
+        await this.read(artwork_id, user_id);
+
+        await artwork.update({
+            where: {
+                id: artwork_id
+            },
+            data,
+        });
+    },
+
+    async delete(artwork_id, user_id) {
+
+        await this.read(artwork_id, user_id);
+
+        console.log(artwork_id)
+
+        await artwork.delete({ where: { id: artwork_id } });
     }
 };
 
