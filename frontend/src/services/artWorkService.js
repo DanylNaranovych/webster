@@ -5,7 +5,19 @@ export default class ArtWorkService {
         return $api.post('artwork/', data);
     }
 
+    static async update(data, id) {
+        return $api.put(`artwork/${id}`, data);
+    }
+
     static async get(id) {
         return $api.get(`artwork/${id}`);
+    }
+
+    static async getAll() {
+        return $api.get('artwork/');
+    }
+
+    static async upload(id, file) {
+        return $api.post(`artwork/${id}/object`, file);
     }
 }

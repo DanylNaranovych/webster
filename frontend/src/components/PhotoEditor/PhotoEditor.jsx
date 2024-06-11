@@ -19,6 +19,11 @@ const PhotoEditor = ({
     onSaveImage,
     onSaveLines,
     selectedTool,
+    imageSrc,
+    setImageSrc,
+    artWork,
+    image,
+    setImage,
     texts,
     setTexts,
     annotations,
@@ -28,9 +33,7 @@ const PhotoEditor = ({
     effectsValues,
     brushType,
 }) => {
-    const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
-    const [image, setImage] = useState(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
     const [selectedImage, setSelectedImage] = useState(null);
@@ -65,14 +68,17 @@ const PhotoEditor = ({
     useImagePaste(setImageSrc);
     useDeleteImage(selectedImage, handleDeleteImage);
 
-    const onDrop = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            setImageSrc(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }, []);
+    const onDrop = useCallback(
+        (acceptedFiles) => {
+            const file = acceptedFiles[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImageSrc(reader.result);
+            };
+            reader.readAsDataURL(file);
+        },
+        [setImageSrc],
+    );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -111,12 +117,30 @@ const PhotoEditor = ({
         if (imageSrc) {
             const img = new window.Image();
             img.src = imageSrc;
+            img.crossOrigin = 'Anonymous';
             img.onload = () => {
                 setImage(img);
                 setImageSize({ width: img.width, height: img.height });
+                if (artWork) {
+                    setImageSize({
+                        width: artWork.content.imageSize.width,
+                        height: artWork.content.imageSize.height,
+                    });
+                    setLines(artWork.content.lines);
+                    setTexts(artWork.content.texts);
+                    setAnnotations(artWork.content.figures);
+                }
             };
         }
-    }, [imageSrc, stageSize]);
+    }, [
+        imageSrc,
+        setImage,
+        stageSize,
+        artWork,
+        setTexts,
+        setLines,
+        setAnnotations,
+    ]);
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {

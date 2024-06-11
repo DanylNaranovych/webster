@@ -31,6 +31,7 @@ const Sidebar = ({
     image,
     onSaveImage,
     onSaveImageToServer,
+    onUpdateArtWork,
     onToolChange,
     onColorChange,
     onBrushSizeChange,
@@ -584,6 +585,13 @@ const Sidebar = ({
                                 onClick={toggleModal}
                             >
                                 Save To Library
+                            </Button>
+                            <Button
+                                variant="primary"
+                                className="mx-1"
+                                onClick={onUpdateArtWork}
+                            >
+                                Save Changes
                             </Button>
                             <SaveModal
                                 show={modalOpen}

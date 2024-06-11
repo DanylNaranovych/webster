@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Pagination } from 'react-bootstrap';
 import styles from '../styles/ImageLibrary.module.css';
 import Header from './Header/Header';
 import DrawingComponent from './DrawingComponent';
+import { useDispatch, useSelector } from 'react-redux';
+import { getArtWorks } from '../store/actions/artWork';
 
 const ImageLibrary = () => {
+    const dispatch = useDispatch();
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
+
+    const artWorks = useSelector((state) => state.artWork.liblaryArtWorks);
+
+    useEffect(() => {
+        dispatch(getArtWorks());
+    }, [dispatch]);
+
+    console.log(artWorks);
+
     const testImages = [
         {
             id: 1,

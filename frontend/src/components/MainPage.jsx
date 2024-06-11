@@ -7,17 +7,25 @@ import Sidebar from './Sidebar/Sidebar';
 import PhotoEditor from './PhotoEditor/PhotoEditor';
 import Message from './Message';
 import { serializeData } from '../utils/jsonUtils';
-import { createArtWork, getArtWork } from '../store/actions/artWork';
+import {
+    clearArtWork,
+    createArtWork,
+    getArtWork,
+    updateArtWork,
+} from '../store/actions/artWork';
 import { handleDownload } from '../utils/saveUtils';
+import { dataURItoBlob } from '../utils/urlUtils';
 import styles from '../styles/MainPage.module.css';
 
 const MainPage = () => {
     const dispatch = useDispatch();
     const message = useSelector((state) => state.auth.message);
+    const artWork = useSelector((state) => state.artWork.artWork);
     const [showMessage, setShowMessage] = useState(false);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
     const [image, setImage] = useState(null);
+    const [imageSrc, setImageSrc] = useState(null);
     const [lineSize, setLineSize] = useState(2);
     const [lines, setLines] = useState([]);
     const [texts, setTexts] = useState([]);
@@ -38,8 +46,17 @@ const MainPage = () => {
     useEffect(() => {
         if (id) {
             dispatch(getArtWork(id));
+        } else {
+            dispatch(clearArtWork());
         }
     }, [id, dispatch]);
+
+    useEffect(() => {
+        if (artWork) {
+            const filename = artWork.content.image.imageSrc.split('/').pop();
+            setImageSrc(`http://127.0.0.1:8000/${filename}`);
+        }
+    }, [artWork, imageSrc]);
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
@@ -146,7 +163,6 @@ const MainPage = () => {
 
     const handleSaveToServer = (name, description) => {
         if (image) {
-            console.log(name, description);
             const data = {
                 content: serializeData(
                     imageSize,
@@ -158,9 +174,52 @@ const MainPage = () => {
                 name: name,
                 description: description,
             };
-            dispatch(createArtWork(data));
+
+            const file = new FormData();
+            if (artWork) {
+                fetch(imageSrc)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        file.append('photo', blob, 'filename.jpg');
+                        dispatch(createArtWork(data, file));
+                    })
+                    .catch((error) => {
+                        console.error('Ошибка при загрузке файла:', error);
+                    });
+            } else {
+                var blob = dataURItoBlob(imageSrc);
+                file.append('photo', blob, 'image.png');
+                dispatch(createArtWork(data, file));
+            }
+
             setShowMessage(true);
         }
+    };
+
+    const handleUpdateArtWork = () => {
+        const data = {
+            content: serializeData(
+                imageSize,
+                lines,
+                texts,
+                figures,
+                effectsValues,
+            ),
+            name: artWork.name,
+            description: artWork.description,
+        };
+        const file = new FormData();
+        fetch(imageSrc)
+            .then((response) => response.blob())
+            .then((blob) => {
+                file.append('photo', blob, 'filename.jpg');
+                dispatch(createArtWork(data, file));
+            })
+            .catch((error) => {
+                console.error('Ошибка при загрузке файла:', error);
+            });
+        dispatch(updateArtWork(data, file, artWork.id));
+        setShowMessage(true);
     };
 
     return (
@@ -179,6 +238,11 @@ const MainPage = () => {
                             onSaveImage={handleSaveImage}
                             onSaveLines={handleSaveLines}
                             texts={texts}
+                            imageSrc={imageSrc}
+                            image={image}
+                            setImage={setImage}
+                            setImageSrc={setImageSrc}
+                            artWork={artWork}
                             setTexts={setTexts}
                             annotations={figures}
                             setAnnotations={setFigures}
@@ -203,6 +267,7 @@ const MainPage = () => {
                                 onColorChange={handleColorChange}
                                 onSaveImage={handleSave}
                                 onSaveImageToServer={handleSaveToServer}
+                                onUpdateArtWork={handleUpdateArtWork}
                                 onBrushSizeChange={handleLineSizeChange}
                                 onToolChange={handleToolChange}
                                 selectedTool={selectedTool}
