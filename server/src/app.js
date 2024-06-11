@@ -26,7 +26,9 @@ app.use("/api", router);
 
 app.use(errorMiddleware);
 
-app.use(express.static(process.env.FILES_DIR));
+app.use(express.static(process.env.AVATARS_DIR));
+app.use(express.static(process.env.OBJECTS_DIR));
+
 
 app.listen(process.env.SERVER_PORT, () => {
     Logger.info(`Server listening on port: ${process.env.SERVER_PORT}`);

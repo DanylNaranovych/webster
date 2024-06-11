@@ -34,7 +34,7 @@ class artworkController {
 
         const artwork = await ArtworkService.read(artworkId, req.user.id);
 
-        res.status(200).json({ ...artwork, content: JSON.parse(artwork.content) });
+        res.status(200).json({ ...artwork });
     }
 
     async updateArtwork(req, res) {
@@ -54,7 +54,7 @@ class artworkController {
         res.sendStatus(201);
     }
 
-     async deleteArtwork(req, res) {
+    async deleteArtwork(req, res) {
         const artwork_id = req.params.id;
          const user_id = req.user.id;
 
@@ -66,15 +66,12 @@ class artworkController {
         res.sendStatus(204);
     }
 
-    updateEventPhoto = async(req, res) => {
-        const eventId = Number(req.params.id);
+    async uploadArtworkObject (req, res) {
+        const artwork_id = req.params.id;
+        const user_id = req.user.id;
         const file = req.files;
 
-        if (!file)
-            throw new ClientError('Please provide a valid file', 400);
-
-        const fileName = await saveFile(file);
-        await artwork.update(eventId, "picture", fileName);
+        await ArtworkService.uploadArtworkObject(file, user_id, artwork_id);
 
         res.sendStatus(200);
     }

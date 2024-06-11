@@ -1,15 +1,17 @@
 import { ClientError } from '../middleware/error.js';
+import fs from "fs";
 
-const saveFile = async(file) => {
+const saveFile = async(filePath, file) => {
 	const fileExtension = file.photo.name.split('.').pop();
 
-	if(fileExtension !== "png" && fileExtension !== "jpg")
-		throw new ClientError('Please provide a valid file', 400);
+	// if(fileExtension !== "png" && fileExtension !== "jpg")
+	// 	throw new ClientError('Please provide a valid file', 400);
 
-	const fileName = 'IMG_' + Date.now() + '.' + fileExtension;
-	await file.photo.mv(process.env.FILES_DIR + fileName);
-
-	return fileName;
+	await file.photo.mv(filePath);
 }
 
-export { saveFile };
+async function deleteFile(filePath) {
+	await fs.unlink(filePath, () =>{});
+}
+
+export { saveFile, deleteFile };

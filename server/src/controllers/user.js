@@ -25,7 +25,7 @@ class usersController {
     }
 
     getUser = async(req, res) => {
-        const userId =  Number(req.params.id);
+        const userId =  req.params.id;
 
         const userData = await usersTable.read(userId);
 
@@ -71,7 +71,7 @@ class usersController {
         res.sendStatus(201);
     }
 
-    updateUserPhoto = async(req, res) => {
+    async uploadArtworkPhotoObject (req, res) {
         const userId = Number(req.params.id);
         const file = req.files;
 
