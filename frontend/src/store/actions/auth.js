@@ -1,13 +1,14 @@
-import AuthService from '../../services/authService.js';
+import AuthService from '../../services/authService';
 
 export const login = (login, password) => async (dispatch) => {
     try {
         const response = await AuthService.login(login, password);
+
         dispatch({ type: 'SET_USER', payload: response.data });
         dispatch({ type: 'SET_MESSAGE', payload: 'Login success' });
     } catch (error) {
-        dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
         console.error('Login failed', error);
+        dispatch({ type: 'SET_MESSAGE', payload: error.message });
     }
 };
 

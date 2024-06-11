@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Accordion,
     Form,
@@ -6,10 +6,8 @@ import {
     Button,
     OverlayTrigger,
     Tooltip,
-    Container,
-    Row,
-    Col,
 } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { SketchPicker, SwatchesPicker } from 'react-color';
 import { AiOutlineSelect } from 'react-icons/ai';
 import { BiText } from 'react-icons/bi';
@@ -21,17 +19,18 @@ import {
     FaCircle,
     FaSprayCan,
     FaFill,
-    FaAngleLeft,
-    FaAngleRight,
 } from 'react-icons/fa';
 
 import TextItemsList from './TextItemsList';
+import SaveModal from './SaveModal';
 
 import styles from '../../styles/Sidebar.module.css';
 
 const Sidebar = ({
     color,
+    image,
     onSaveImage,
+    onSaveImageToServer,
     onToolChange,
     onColorChange,
     onBrushSizeChange,
@@ -45,22 +44,18 @@ const Sidebar = ({
     onEffectsValuesChange,
     brushType,
     onChangeBrushType,
-    onUndo,
-    onRedo,
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
-    const [currentEffectsValues, setCurrentEffectsValues] = useState(effectsValues);
-
-    const handleCurrentEffectsValuesChange = (effect, value) => {
-        setCurrentEffectsValues((prevValues) => ({
-            ...prevValues,
-            [effect]: value,
-        }));
-    };
+    const [modalOpen, setModalOpen] = useState(false);
+    const user = useSelector((state) => state.auth.user);
 
     const handleSaveClick = () => {
         onSaveImage();
+    };
+
+    const toggleModal = () => {
+        setModalOpen(!modalOpen);
     };
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
@@ -85,17 +80,6 @@ const Sidebar = ({
         <Tooltip id="button-tooltip">{text}</Tooltip>
     );
 
-    useEffect(() => {
-        if (effectsValues) {
-            Object.keys(effectsValues).forEach((key) => {
-                if (effectsValues[key] !== currentEffectsValues[key]) {
-                    handleCurrentEffectsValuesChange(key, effectsValues[key]);
-                }
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [onUndo, onRedo]);
-
     return (
         <Nav className={`flex-column p-3 ${styles.sidebar}`}>
             <Nav.Item>
@@ -117,14 +101,16 @@ const Sidebar = ({
                                             min="-1"
                                             max="1"
                                             step="0.05"
-                                            value={currentEffectsValues.brightness}
-                                            onChange={(e) =>
-                                                handleCurrentEffectsValuesChange(
+                                            defaultValue={
+                                                effectsValues.brightness
+                                            }
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange(
                                                     'brightness',
                                                     e.target.value,
                                                 )
                                             }
-                                            onMouseUp={(e) =>
+                                            onTouchEnd={(e) =>
                                                 onEffectsValuesChange(
                                                     'brightness',
                                                     e.target.value,
@@ -147,14 +133,16 @@ const Sidebar = ({
                                             min="-10"
                                             max="10"
                                             step="0.05"
-                                            value={currentEffectsValues.contrast}
-                                            onChange={(e) =>
-                                                handleCurrentEffectsValuesChange(
+                                            defaultValue={
+                                                effectsValues.contrast
+                                            }
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange(
                                                     'contrast',
                                                     e.target.value,
                                                 )
                                             }
-                                            onMouseUp={(e) =>
+                                            onTouchEnd={(e) =>
                                                 onEffectsValuesChange(
                                                     'contrast',
                                                     e.target.value,
@@ -177,14 +165,16 @@ const Sidebar = ({
                                             min="1"
                                             max="7"
                                             step="0.05"
-                                            value={currentEffectsValues.grayscale}
-                                            onChange={(e) =>
-                                                handleCurrentEffectsValuesChange(
+                                            defaultValue={
+                                                effectsValues.grayscale
+                                            }
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange(
                                                     'grayscale',
                                                     e.target.value,
                                                 )
                                             }
-                                            onMouseUp={(e) =>
+                                            onTouchEnd={(e) =>
                                                 onEffectsValuesChange(
                                                     'grayscale',
                                                     e.target.value,
@@ -207,14 +197,16 @@ const Sidebar = ({
                                             min="-2"
                                             max="2"
                                             step="0.05"
-                                            value={currentEffectsValues.saturate}
-                                            onChange={(e) =>
-                                                handleCurrentEffectsValuesChange(
+                                            defaultValue={
+                                                effectsValues.saturate
+                                            }
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange(
                                                     'saturate',
                                                     e.target.value,
                                                 )
                                             }
-                                            onMouseUp={(e) =>
+                                            onTouchEnd={(e) =>
                                                 onEffectsValuesChange(
                                                     'saturate',
                                                     e.target.value,
@@ -237,14 +229,14 @@ const Sidebar = ({
                                             min="0"
                                             max="100"
                                             step="5"
-                                            value={currentEffectsValues.blur}
-                                            onChange={(e) =>
-                                                handleCurrentEffectsValuesChange(
+                                            defaultValue={effectsValues.blur}
+                                            onMouseUp={(e) =>
+                                                onEffectsValuesChange(
                                                     'blur',
                                                     e.target.value,
                                                 )
                                             }
-                                            onMouseUp={(e) =>
+                                            onTouchEnd={(e) =>
                                                 onEffectsValuesChange(
                                                     'blur',
                                                     e.target.value,
@@ -440,8 +432,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 5 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 5 ? 'active' : ''
+                                        }`}
                                         onClick={() => handleBrushSizeChange(5)}
                                     >
                                         <span style={{ fontSize: '14px' }}>
@@ -455,8 +448,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 10 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 10 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(10)
                                         }
@@ -472,8 +466,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 15 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 15 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(15)
                                         }
@@ -489,8 +484,9 @@ const Sidebar = ({
                                 >
                                     <Button
                                         variant="light"
-                                        className={`mr-2 ${brushSize === 20 ? 'active' : ''
-                                            }`}
+                                        className={`mr-2 ${
+                                            brushSize === 20 ? 'active' : ''
+                                        }`}
                                         onClick={() =>
                                             handleBrushSizeChange(20)
                                         }
@@ -571,34 +567,33 @@ const Sidebar = ({
                 onUpdateText={handleUpdateText}
                 onDeleteText={onDeleteText}
             />
-            <Nav.Item className="mt-3">
-                <Button variant="primary" onClick={handleSaveClick}>
-                    Save Image
-                </Button>
-            </Nav.Item>
-
-            <Container fluid className="fixed-bottom bg-light p-2">
-                <Row>
-                    <Col className="d-flex justify-content-between">
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={renderTooltip('Undo')}
-                        >
-                            <Button onClick={onUndo}>
-                                <FaAngleLeft />
+            {image && (
+                <Nav.Item className="mt-3 d-flex align-items-center">
+                    <Button
+                        variant="primary"
+                        className="mx-1"
+                        onClick={handleSaveClick}
+                    >
+                        Save Image
+                    </Button>
+                    {user && (
+                        <div>
+                            <Button
+                                variant="primary"
+                                className="mx-1"
+                                onClick={toggleModal}
+                            >
+                                Save To Library
                             </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                            placement="top"
-                            overlay={renderTooltip('Redo')}
-                        >
-                            <Button onClick={onRedo}>
-                                <FaAngleRight />
-                            </Button>
-                        </OverlayTrigger>
-                    </Col>
-                </Row>
-            </Container>
+                            <SaveModal
+                                show={modalOpen}
+                                handleSave={onSaveImageToServer}
+                                handleClose={toggleModal}
+                            />
+                        </div>
+                    )}
+                </Nav.Item>
+            )}
         </Nav>
     );
 };

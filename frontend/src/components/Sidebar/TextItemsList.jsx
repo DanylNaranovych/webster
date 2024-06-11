@@ -71,7 +71,6 @@ const TextItemsList = ({
                                 </div>
                             )}
                         </Form.Label>
-                        {console.log(selectedText)}
                         <ListGroup>
                             {texts.map((textItem, index) => (
                                 <ListGroup.Item

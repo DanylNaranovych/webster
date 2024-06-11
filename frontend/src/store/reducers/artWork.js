@@ -1,12 +1,12 @@
 const initialState = {
-    user: null,
+    data: [],
     message: '',
 };
 
-const authReducer = (state = initialState, action) => {
+const artWorkReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'SET_USER':
-            return { ...state, user: action.payload };
+        case 'SET_ARTWORK':
+            return { ...state, data: action.payload };
         case 'SET_MESSAGE':
             return { ...state, message: action.payload };
         default:
@@ -14,4 +14,4 @@ const authReducer = (state = initialState, action) => {
     }
 };
 
-export default authReducer;
+export default artWorkReducer;

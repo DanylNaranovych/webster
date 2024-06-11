@@ -11,12 +11,7 @@ const Header = () => {
     const [show, setShow] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
 
-    // const user = useSelector((state) => state.auth.user);
-    const user = {
-        name: 'Xanzik',
-        avatar: 'https://innostudio.de/fileuploader/images/default-avatar.png',
-    };
-
+    const user = useSelector((state) => state.auth.user);
     const message = useSelector((state) => state.auth.message);
 
     const handleClose = () => setShow(false);
@@ -89,11 +84,11 @@ const Header = () => {
                             >
                                 <Dropdown.Toggle className={styles.userButton}>
                                     <img
-                                        src={user.avatar}
+                                        src="https://innostudio.de/fileuploader/images/default-avatar.png"
                                         alt="User Avatar"
                                         className={styles.userAvatar}
                                     />
-                                    {user.name}
+                                    {user.login}
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                     <Dropdown.Item
