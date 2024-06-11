@@ -34,6 +34,8 @@ const PhotoEditor = ({
     brushType,
     onFiguresChange,
     onTextsChange,
+    lines,
+    setLines,
 }) => {
     const containerRef = useRef(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -44,7 +46,6 @@ const PhotoEditor = ({
     const stageRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const [lines, setLines] = useState([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [newAnnotation, setNewAnnotation] = useState([]);
@@ -101,10 +102,6 @@ const PhotoEditor = ({
     }, [scale, onScaleChange]);
 
     useEffect(() => {
-        onSaveLines(lines);
-    }, [lines, onSaveLines]);
-
-    useEffect(() => {
         if (containerRef.current) {
             const { clientWidth, clientHeight } = containerRef.current;
             setStageSize({
@@ -142,8 +139,6 @@ const PhotoEditor = ({
         setLines,
         setAnnotations,
     ]);
-
-    console.log('check');
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {
@@ -221,7 +216,8 @@ const PhotoEditor = ({
             const x = (pointerPosition.x - stagePos.x) / scale;
             const y = (pointerPosition.y - stagePos.y) / scale;
             if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                setLines([...lines, { points: [x, y], color, size }]);
+                onSaveLines([...lines, { points: [x, y], color, size }]);
+                // setLines([...lines, { points: [x, y], color, size }]);
             }
             return;
         }
@@ -344,6 +340,7 @@ const PhotoEditor = ({
                         color: drawColor,
                         size: drawingSize,
                     };
+                    // onSaveLines([...lines, newLine]);
                     setLines([...lines, newLine]);
                 }
 
@@ -357,6 +354,10 @@ const PhotoEditor = ({
                         );
                         if (distance > 5) {
                             lastLine.points = lastLine.points.concat([x, y]);
+                            // onSaveLines([
+                            //     ...lines.slice(0, lines.length - 1),
+                            //     lastLine,
+                            // ]);
                             setLines([
                                 ...lines.slice(0, lines.length - 1),
                                 lastLine,
@@ -375,6 +376,10 @@ const PhotoEditor = ({
                         );
                         if (distance > 2) {
                             lastLine.points = lastLine.points.concat([x, y]);
+                            // onSaveLines([
+                            //     ...lines.slice(0, lines.length - 1),
+                            //     lastLine,
+                            // ]);
                             setLines([
                                 ...lines.slice(0, lines.length - 1),
                                 lastLine,
@@ -450,9 +455,13 @@ const PhotoEditor = ({
                 size: drawingSize,
                 tool: selectedTool,
             };
-            annotations.push(annotationToAdd);
+
+            setAnnotations((prevAnnotations) => {
+                const newAnnotations = [...prevAnnotations, annotationToAdd];
+                onFiguresChange(newAnnotations);
+                return newAnnotations;
+            });
             setNewAnnotation([]);
-            onFiguresChange(annotations);
         }
     };
 

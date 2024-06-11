@@ -204,7 +204,7 @@ const MainPage = () => {
     };
 
     const handleLinesSave = (newLines) => {
-        if (newLines === history[historyStep].lines) {
+        if (newLines === history[historyStep].lines || brushType === 'fill') {
             return;
         }
 
@@ -304,7 +304,7 @@ const MainPage = () => {
                         dispatch(createArtWork(data, file));
                     })
                     .catch((error) => {
-                        console.error('Ошибка при загрузке файла:', error);
+                        console.error('Download Error:', error);
                     });
             } else {
                 var blob = dataURItoBlob(imageSrc);
@@ -336,7 +336,7 @@ const MainPage = () => {
                 dispatch(createArtWork(data, file));
             })
             .catch((error) => {
-                console.error('Ошибка при загрузке файла:', error);
+                console.error('Error while downloading:', error);
             });
         dispatch(updateArtWork(data, file, artWork.id));
         setShowMessage(true);
@@ -397,6 +397,8 @@ const MainPage = () => {
                             selectedText={selectedText}
                             effectsValues={effectsValues}
                             brushType={brushType}
+                            lines={lines}
+                            setLines={setLines}
                         />
                     </Col>
 
