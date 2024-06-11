@@ -15,7 +15,7 @@ router.get('/:id', boundary(controller.getArtwork));
 router.put('/:id', boundary(controller.updateArtwork));
 router.delete("/:id", boundary(controller.deleteArtwork));
 router.post("/:id/object", boundary(controller.uploadArtworkObject));
-router.delete("/:id/object", boundary(controller.uploadArtworkObject));
+// router.delete("/:id/object", boundary(controller.uploadArtworkObject));
 
 
 export default router;
