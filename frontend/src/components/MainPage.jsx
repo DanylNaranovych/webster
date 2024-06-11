@@ -42,7 +42,6 @@ const MainPage = () => {
         saturate: 0,
         blur: 0,
     });
-    const { id } = useParams();
 
     const [history, setHistory] = useState([
         {
@@ -53,13 +52,81 @@ const MainPage = () => {
                 saturate: 0,
                 blur: 0,
             },
+            lines: [],
+            texts: [],
+            figures: [],
         },
     ]);
 
+    const { id } = useParams();
+
     const addEffectsToHistory = (newEffectsValues) => {
+        const previousHistoryItem = history[historyStep];
+
+        const newHistoryItem = {
+            effectsValues: newEffectsValues,
+            lines: previousHistoryItem.lines,
+            texts: previousHistoryItem.texts,
+            figures: previousHistoryItem.figures,
+        };
+
         const newHistory = [
             ...history.slice(0, historyStep + 1),
-            { effectsValues: newEffectsValues },
+            newHistoryItem,
+        ];
+        setHistory(newHistory);
+        setHistoryStep(historyStep + 1);
+    };
+
+    const addLinesToHistory = (newLines) => {
+        const previousHistoryItem = history[historyStep];
+
+        const newHistoryItem = {
+            effectsValues: previousHistoryItem.effectsValues,
+            lines: newLines,
+            texts: previousHistoryItem.texts,
+            figures: previousHistoryItem.figures,
+        };
+
+        const newHistory = [
+            ...history.slice(0, historyStep + 1),
+            newHistoryItem,
+        ];
+        setHistory(newHistory);
+        setHistoryStep(historyStep + 1);
+    };
+
+    const addTextsToHistory = (newTexts) => {
+        const previousHistoryItem = history[historyStep];
+
+        const newHistoryItem = {
+            effectsValues: previousHistoryItem.effectsValues,
+            lines: previousHistoryItem.lines,
+            texts: newTexts,
+            figures: previousHistoryItem.figures,
+        };
+
+        const newHistory = [
+            ...history.slice(0, historyStep + 1),
+            newHistoryItem,
+        ];
+        setHistory(newHistory);
+        setHistoryStep(historyStep + 1);
+    };
+
+    const addFiguresToHistory = (newFigures) => {
+        const previousHistoryItem = history[historyStep];
+
+        const newHistoryItem = {
+            effectsValues: previousHistoryItem.effectsValues,
+            lines: previousHistoryItem.lines,
+            texts: previousHistoryItem.texts,
+            figures: newFigures,
+        };
+
+        const newHistory = [
+            ...history.slice(0, historyStep + 1),
+            newHistoryItem,
         ];
         setHistory(newHistory);
         setHistoryStep(historyStep + 1);
@@ -122,13 +189,45 @@ const MainPage = () => {
     };
 
     const handleEffectsValuesChange = (effect, value) => {
+        if (Number(value) === history[historyStep].effectsValues[effect]) {
+            return;
+        }
+
         const newEffectsValues = {
             ...effectsValues,
 
             [effect]: Number(value),
         };
+
         setEffectsValues(newEffectsValues);
         addEffectsToHistory(newEffectsValues);
+    };
+
+    const handleLinesSave = (newLines) => {
+        if (newLines === history[historyStep].lines) {
+            return;
+        }
+
+        setLines(newLines);
+        addLinesToHistory(newLines);
+    };
+
+    const handleTextsSave = (newTexts) => {
+        if (newTexts === history[historyStep].texts) {
+            return;
+        }
+
+        setTexts(newTexts);
+        addTextsToHistory(newTexts);
+    };
+
+    const handleFiguresSave = (newFigures) => {
+        if (newFigures === history[historyStep].figures) {
+            return;
+        }
+
+        setFigures(newFigures);
+        addFiguresToHistory(newFigures);
     };
 
     const handleChangeBrushType = (brushType) => {
@@ -138,10 +237,6 @@ const MainPage = () => {
 
     const handleImageSizeChange = (newSize) => {
         setImageSize(newSize);
-    };
-
-    const handleSaveLines = (newLines) => {
-        setLines(newLines);
     };
 
     const handleScaleChange = (newScale) => {
@@ -253,14 +348,22 @@ const MainPage = () => {
         }
         setHistoryStep(historyStep + 1);
         setEffectsValues(history[historyStep + 1].effectsValues);
+        setLines(history[historyStep + 1].lines);
+        setTexts(history[historyStep + 1].texts);
+        setFigures(history[historyStep + 1].figures);
     };
 
     const handleUndo = () => {
+        console.log(history);
+        console.log(historyStep);
         if (historyStep === 0) {
             return;
         }
         setHistoryStep(historyStep - 1);
         setEffectsValues(history[historyStep - 1].effectsValues);
+        setLines(history[historyStep - 1].lines);
+        setTexts(history[historyStep - 1].texts);
+        setFigures(history[historyStep - 1].figures);
     };
 
     return (
@@ -277,16 +380,16 @@ const MainPage = () => {
                             drawingSize={lineSize}
                             selectedTool={selectedTool}
                             onSaveImage={handleSaveImage}
-                            onSaveLines={handleSaveLines}
+                            onSaveLines={handleLinesSave}
                             texts={texts}
                             imageSrc={imageSrc}
                             image={image}
                             setImage={setImage}
                             setImageSrc={setImageSrc}
                             artWork={artWork}
-                            setTexts={setTexts}
+                            setTexts={handleTextsSave}
                             annotations={figures}
-                            setAnnotations={setFigures}
+                            setAnnotations={handleFiguresSave}
                             deleteAnnotation={handleDeleteFigure}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}
