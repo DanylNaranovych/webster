@@ -375,6 +375,8 @@ const MainPage = () => {
                         <PhotoEditor
                             onImageSizeChange={handleImageSizeChange}
                             onScaleChange={handleScaleChange}
+                            onTextsChange={handleTextsSave}
+                            onFiguresChange={handleFiguresSave}
                             scale={scale}
                             drawColor={color}
                             drawingSize={lineSize}
@@ -387,9 +389,9 @@ const MainPage = () => {
                             setImage={setImage}
                             setImageSrc={setImageSrc}
                             artWork={artWork}
-                            setTexts={handleTextsSave}
+                            setTexts={setTexts}
                             annotations={figures}
-                            setAnnotations={handleFiguresSave}
+                            setAnnotations={setFigures}
                             deleteAnnotation={handleDeleteFigure}
                             onSelectedText={handleSelectText}
                             selectedText={selectedText}

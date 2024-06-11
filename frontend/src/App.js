@@ -9,6 +9,7 @@ import ImageLibrary from './components/ImageLibrary';
 import About from './components/Header/About';
 import Contact from './components/Header/Contact';
 import Profile from './components/Profile';
+import ConfirmationPage from './components/ConfirmationPage';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -26,6 +27,10 @@ const App = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route
+                    path="/confirm-email/:token"
+                    element={<ConfirmationPage />}
+                />
             </Routes>
         </Router>
     );

@@ -32,6 +32,8 @@ const PhotoEditor = ({
     selectedText,
     effectsValues,
     brushType,
+    onFiguresChange,
+    onTextsChange,
 }) => {
     const containerRef = useRef(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -140,6 +142,8 @@ const PhotoEditor = ({
         setLines,
         setAnnotations,
     ]);
+
+    console.log('check');
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {
@@ -277,7 +281,7 @@ const PhotoEditor = ({
                     draggable: true,
                     id: `text-${id}`,
                 };
-                setTexts([...texts, textProps]);
+                onTextsChange([...texts, textProps]);
             }
             return;
         }
@@ -448,7 +452,7 @@ const PhotoEditor = ({
             };
             annotations.push(annotationToAdd);
             setNewAnnotation([]);
-            setAnnotations(annotations);
+            onFiguresChange(annotations);
         }
     };
 
@@ -456,7 +460,7 @@ const PhotoEditor = ({
         const rects = texts.slice();
         const index = rects.findIndex((rect) => rect.id === newAttrs.id);
         rects[index] = newAttrs;
-        setTexts(rects);
+        onTextsChange(rects);
     };
 
     const annotationsToDraw = [...annotations, ...newAnnotation];
