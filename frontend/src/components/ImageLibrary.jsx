@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Pagination } from 'react-bootstrap';
 import styles from '../styles/ImageLibrary.module.css';
 import Header from './Header/Header';
-import DrawingComponent from './DrawingComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { getArtWorks } from '../store/actions/artWork';
 
@@ -17,136 +17,11 @@ const ImageLibrary = () => {
         dispatch(getArtWorks());
     }, [dispatch]);
 
-    console.log(artWorks);
-
-    const testImages = [
-        {
-            id: 1,
-            data: {
-                imageSize: {
-                    width: 800,
-                    height: 600,
-                },
-                lines: [
-                    {
-                        points: [20, 40, 200, 40, 50, 100, 50],
-                        color: 'red',
-                        size: 1,
-                    },
-                ],
-                texts: [
-                    {
-                        id: 'text1',
-                        x: 100,
-                        y: 100,
-                        text: 'Sample Text',
-                        fontSize: 18,
-                        fontFamily: 'Arial',
-                        color: 'black',
-                    },
-                ],
-                figures: [
-                    {
-                        id: 'rect1',
-                        x: 500,
-                        y: 1000,
-                        tool: 'rectangle',
-                        width: 100,
-                        height: 50,
-                        fill: 'green',
-                        color: 'blue',
-                        size: 2,
-                    },
-                ],
-            },
-        },
-        {
-            id: 2,
-            data: {
-                imageSize: {
-                    width: 800,
-                    height: 600,
-                },
-                lines: [
-                    {
-                        points: [20, 40, 200, 40],
-                        color: 'red',
-                        size: 5,
-                    },
-                ],
-                texts: [
-                    {
-                        id: 'text1',
-                        x: 100,
-                        y: 500,
-                        text: 'Sample Text',
-                        fontSize: 18,
-                        fontFamily: 'Arial',
-                        color: 'black',
-                    },
-                ],
-                figures: [
-                    {
-                        id: 'rect1',
-                        x: 300,
-                        y: 200,
-                        tool: 'rectangle',
-                        width: 100,
-                        height: 50,
-                        fill: 'green',
-                        color: 'blue',
-                        size: 2,
-                    },
-                ],
-            },
-        },
-        {
-            id: 3,
-            data: {
-                imageSize: {
-                    width: 800,
-                    height: 600,
-                },
-                lines: [
-                    {
-                        points: [20, 40, 200, 40],
-                        color: 'red',
-                        size: 5,
-                    },
-                ],
-                texts: [
-                    {
-                        id: 'text1',
-                        x: 100,
-                        y: 100,
-                        text: 'Sample Text',
-                        fontSize: 18,
-                        fontFamily: 'Arial',
-                        color: 'black',
-                    },
-                ],
-                figures: [
-                    {
-                        id: 'rect1',
-                        x: 300,
-                        y: 200,
-                        tool: 'rectangle',
-                        width: 100,
-                        height: 50,
-                        fill: 'green',
-                        color: 'blue',
-                        size: 2,
-                    },
-                ],
-            },
-        },
-    ];
-
     const indexOfLastImage = currentPage * itemsPerPage;
     const indexOfFirstImage = indexOfLastImage - itemsPerPage;
-    const currentImages = testImages.slice(indexOfFirstImage, indexOfLastImage);
+    const currentImages = artWorks.slice(indexOfFirstImage, indexOfLastImage);
 
-    const totalPages = Math.ceil(testImages.length / itemsPerPage);
+    const totalPages = Math.ceil(artWorks.length / itemsPerPage);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -155,22 +30,42 @@ const ImageLibrary = () => {
     return (
         <div>
             <Header />
-            <Container className={styles.imageLibrary}>
+            <Container className={`${styles.imageLibrary} mx-auto my-5`}>
                 <Row>
-                    {currentImages.map((image) => (
-                        <Col
-                            key={image.id}
-                            xs={12}
-                            sm={6}
-                            md={4}
-                            lg={3}
-                            className="mb-4"
-                        >
-                            <Card className={styles.card}>
-                                <DrawingComponent data={image.data} />
-                            </Card>
-                        </Col>
-                    ))}
+                    {currentImages.map((image) => {
+                        const filePath = image.photo;
+                        const parts = filePath.split('\\');
+                        const photoUrl = parts[parts.length - 1];
+
+                        return (
+                            <Col
+                                key={image.id}
+                                xs={12}
+                                sm={6}
+                                md={4}
+                                lg={3}
+                                className="mb-4"
+                            >
+                                <Link to={`/${image.id}`}>
+                                    <Card className={styles.card}>
+                                        <Card.Img
+                                            variant="top"
+                                            src={`http://127.0.0.1:8000//${photoUrl}`}
+                                        />
+                                        <Card.Body>
+                                            <Card.Title>
+                                                {image.name}
+                                            </Card.Title>
+                                            <Card.Text>
+                                                {image.description ||
+                                                    'No description.'}
+                                            </Card.Text>
+                                        </Card.Body>
+                                    </Card>
+                                </Link>
+                            </Col>
+                        );
+                    })}
                 </Row>
 
                 <Pagination className={styles.paginationContainer}>

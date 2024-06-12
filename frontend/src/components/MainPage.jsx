@@ -13,7 +13,7 @@ import {
     getArtWork,
     updateArtWork,
 } from '../store/actions/artWork';
-import { handleDownload } from '../utils/saveUtils';
+import { CreateArtWorkPhoto, handleDownload } from '../utils/saveUtils';
 import { dataURItoBlob } from '../utils/urlUtils';
 import styles from '../styles/MainPage.module.css';
 
@@ -21,6 +21,7 @@ const MainPage = () => {
     const dispatch = useDispatch();
     const message = useSelector((state) => state.auth.message);
     const artWork = useSelector((state) => state.artWork.artWork);
+    const { id } = useParams();
     const [showMessage, setShowMessage] = useState(false);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [scale, setScale] = useState(1);
@@ -57,8 +58,6 @@ const MainPage = () => {
             figures: [],
         },
     ]);
-
-    const { id } = useParams();
 
     const addEffectsToHistory = (newEffectsValues) => {
         const previousHistoryItem = history[historyStep];
@@ -142,8 +141,9 @@ const MainPage = () => {
 
     useEffect(() => {
         if (artWork) {
-            const filename = artWork.content.image.imageSrc.split('/').pop();
-            setImageSrc(`http://127.0.0.1:8000/${filename}`);
+            const filename = artWork.content.image.imageSrc.split('\\');
+            const photoUrl = filename[filename.length - 1];
+            setImageSrc(`http://127.0.0.1:8000/${photoUrl}`);
         }
     }, [artWork, imageSrc]);
 
@@ -295,21 +295,63 @@ const MainPage = () => {
                 description: description,
             };
 
-            const file = new FormData();
+            const mainImageFile = new FormData();
+            const projectImageFile = new FormData();
             if (artWork) {
                 fetch(imageSrc)
                     .then((response) => response.blob())
-                    .then((blob) => {
-                        file.append('photo', blob, 'filename.jpg');
-                        dispatch(createArtWork(data, file));
+                    .then((mainImageBlob) => {
+                        mainImageFile.append(
+                            'photo',
+                            mainImageBlob,
+                            'filename.jpg',
+                        );
+                        var projectImageBlob = dataURItoBlob(
+                            CreateArtWorkPhoto(
+                                effectsValues,
+                                lines,
+                                texts,
+                                figures,
+                                imageSize,
+                                image,
+                            ),
+                        );
+                        projectImageFile.append(
+                            'photo',
+                            projectImageBlob,
+                            'projectImage.png',
+                        );
+
+                        dispatch(
+                            createArtWork(
+                                data,
+                                mainImageFile,
+                                projectImageFile,
+                            ),
+                        );
                     })
                     .catch((error) => {
                         console.error('Download Error:', error);
                     });
             } else {
-                var blob = dataURItoBlob(imageSrc);
-                file.append('photo', blob, 'image.png');
-                dispatch(createArtWork(data, file));
+                var mainImageBlob = dataURItoBlob(imageSrc);
+                var projectImageBlob = dataURItoBlob(
+                    CreateArtWorkPhoto(
+                        effectsValues,
+                        lines,
+                        texts,
+                        figures,
+                        imageSize,
+                        image,
+                    ),
+                );
+                mainImageFile.append('photo', mainImageBlob, 'mainImage.png');
+                projectImageFile.append(
+                    'photo',
+                    projectImageBlob,
+                    'projectImage.png',
+                );
+                dispatch(createArtWork(data, mainImageFile, projectImageFile));
             }
 
             setShowMessage(true);
@@ -328,17 +370,41 @@ const MainPage = () => {
             name: artWork.name,
             description: artWork.description,
         };
-        const file = new FormData();
+        const mainImageFile = new FormData();
+        const projectImageFile = new FormData();
+
         fetch(imageSrc)
             .then((response) => response.blob())
             .then((blob) => {
-                file.append('photo', blob, 'filename.jpg');
-                dispatch(createArtWork(data, file));
+                mainImageFile.append('photo', blob, 'filename.jpg');
+                var projectImageBlob = dataURItoBlob(
+                    CreateArtWorkPhoto(
+                        effectsValues,
+                        lines,
+                        texts,
+                        figures,
+                        imageSize,
+                        image,
+                    ),
+                );
+                projectImageFile.append(
+                    'photo',
+                    projectImageBlob,
+                    'projectImage.png',
+                );
+                dispatch(
+                    updateArtWork(
+                        data,
+                        mainImageFile,
+                        projectImageFile,
+                        artWork.id,
+                    ),
+                );
             })
             .catch((error) => {
                 console.error('Error while downloading:', error);
             });
-        dispatch(updateArtWork(data, file, artWork.id));
+
         setShowMessage(true);
     };
 

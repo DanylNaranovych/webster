@@ -20,4 +20,8 @@ export default class ArtWorkService {
     static async upload(id, file) {
         return $api.post(`artwork/${id}/object`, file);
     }
+
+    static async uploadPhoto(id, file) {
+        return $api.post(`artwork/${id}/photo`, file);
+    }
 }

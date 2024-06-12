@@ -1,27 +1,46 @@
 import ArtWorkService from '../../services/artWorkService';
 
-export const createArtWork = (data, file) => async (dispatch) => {
-    try {
-        const response = await ArtWorkService.create(data);
-        const id = response.data.id;
-        dispatch(uploadArtWork(id, file));
-        dispatch({ type: 'SET_MESSAGE', payload: 'Successfully saved.' });
-    } catch (error) {
-        dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
-    }
-};
+export const createArtWork =
+    (data, mainImageFile, projectImageFile) => async (dispatch) => {
+        try {
+            const response = await ArtWorkService.create(data);
+            const id = response.data.id;
+            dispatch(uploadArtWork(id, mainImageFile));
+            dispatch(uploadArtWorkPhoto(id, projectImageFile));
+            dispatch({
+                type: 'SET_MESSAGE',
+                payload:
+                    'Your ArtWork successfully saved. You can find it in your library.',
+            });
+        } catch (error) {
+            dispatch({
+                type: 'SET_MESSAGE',
+                payload: error.response.data.message,
+            });
+            console.error('Creating ArtWork failed', error);
+        }
+    };
 
-export const updateArtWork = (data, file, id) => async (dispatch) => {
-    try {
-        await ArtWorkService.update(data, id);
-        dispatch(uploadArtWork(id, file));
-        dispatch({ type: 'SET_MESSAGE', payload: 'Successfully saved.' });
-    } catch (error) {
-        dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
-    }
-};
+export const updateArtWork =
+    (data, mainImageFile, projectImageFile, id) => async (dispatch) => {
+        try {
+            await ArtWorkService.update(data, id);
+            console.log(mainImageFile);
+            console.log(projectImageFile);
+            dispatch(uploadArtWork(id, mainImageFile));
+            dispatch(uploadArtWorkPhoto(id, projectImageFile));
+            dispatch({
+                type: 'SET_MESSAGE',
+                payload: 'Your ArtWork successfully saved.',
+            });
+        } catch (error) {
+            dispatch({
+                type: 'SET_MESSAGE',
+                payload: error.response.data.message,
+            });
+            console.error('Updating ArtWork failed', error);
+        }
+    };
 
 export const getArtWork = (id) => async (dispatch) => {
     try {
@@ -29,17 +48,20 @@ export const getArtWork = (id) => async (dispatch) => {
         dispatch({ type: 'SET_ARTWORK', payload: response.data });
     } catch (error) {
         dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
+        console.error('Getting Artwork failed', error);
     }
 };
 
 export const getArtWorks = () => async (dispatch) => {
     try {
         const response = await ArtWorkService.getAll();
-        dispatch({ type: 'SET_ARTWORKS', payload: response.data });
+        dispatch({
+            type: 'SET_ARTWORKS',
+            payload: response.data.artworksArray,
+        });
     } catch (error) {
         dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
+        console.error('Getting Artwork Error', error);
     }
 };
 
@@ -48,7 +70,16 @@ export const uploadArtWork = (id, file) => async (dispatch) => {
         await ArtWorkService.upload(id, file);
     } catch (error) {
         dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
+        console.error('Upload failed', error);
+    }
+};
+
+export const uploadArtWorkPhoto = (id, file) => async (dispatch) => {
+    try {
+        await ArtWorkService.uploadPhoto(id, file);
+    } catch (error) {
+        dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
+        console.error('Upload photo failed', error);
     }
 };
 
@@ -57,6 +88,6 @@ export const clearArtWork = () => async (dispatch) => {
         dispatch({ type: 'SET_ARTWORK', payload: null });
     } catch (error) {
         dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
-        console.error('Create failed', error);
+        console.error('Clear Artwork Error', error);
     }
 };
