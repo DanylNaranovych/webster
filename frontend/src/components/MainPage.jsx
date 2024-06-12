@@ -167,9 +167,7 @@ const MainPage = () => {
     };
 
     const handleDeleteText = (textId) => {
-        setTexts((prevTexts) =>
-            prevTexts.filter((textItem) => textItem.id !== textId),
-        );
+        setTexts(texts.filter((textItem) => textItem.id !== textId));
     };
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
@@ -498,6 +496,7 @@ const MainPage = () => {
                                 onRedo={handleRedo}
                                 brushType={brushType}
                                 onChangeBrushType={handleChangeBrushType}
+                                artWork={artWork}
                             />
                         </div>
                     </Col>

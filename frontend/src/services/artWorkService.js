@@ -24,4 +24,8 @@ export default class ArtWorkService {
     static async uploadPhoto(id, file) {
         return $api.post(`artwork/${id}/photo`, file);
     }
+
+    static async delete(id) {
+        return $api.delete(`artwork/${id}`);
+    }
 }

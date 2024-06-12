@@ -12,6 +12,13 @@ const artWorkReducer = (state = initialState, action) => {
             return { ...state, liblaryArtWorks: action.payload };
         case 'SET_MESSAGE':
             return { ...state, message: action.payload };
+        case 'REMOVE_ARTWORK':
+            return {
+                ...state,
+                liblaryArtWorks: state.liblaryArtWorks.filter(
+                    (artwork) => artwork.id !== action.payload,
+                ),
+            };
         default:
             return state;
     }

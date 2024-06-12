@@ -52,6 +52,7 @@ const Sidebar = ({
     onChangeBrushType,
     onUndo,
     onRedo,
+    artWork,
 }) => {
     const [brushSize, setBrushSize] = useState(0);
     const [localColor, setLocalColor] = useState(color);
@@ -635,13 +636,15 @@ const Sidebar = ({
                             >
                                 Save To Library
                             </Button>
-                            <Button
-                                variant="primary"
-                                className="mx-1"
-                                onClick={onUpdateArtWork}
-                            >
-                                Save Changes
-                            </Button>
+                            {artWork && (
+                                <Button
+                                    variant="primary"
+                                    className="mx-1"
+                                    onClick={onUpdateArtWork}
+                                >
+                                    Save Changes
+                                </Button>
+                            )}
                             <SaveModal
                                 show={modalOpen}
                                 handleSave={onSaveImageToServer}

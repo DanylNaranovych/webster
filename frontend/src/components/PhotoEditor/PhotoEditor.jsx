@@ -9,6 +9,7 @@ import ImageControls from './ImageControls';
 import AnnotationFigure from './AnnotationFigure';
 import styles from '../../styles/PhotoEditor.module.css';
 import Konva from 'konva';
+import { v4 as uuidv4 } from 'uuid';
 
 const PhotoEditor = ({
     onImageSizeChange,
@@ -254,7 +255,7 @@ const PhotoEditor = ({
         }
 
         if (selectedTool === 'text') {
-            const id = texts.length + 1;
+            const id = uuidv4();
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -281,6 +282,7 @@ const PhotoEditor = ({
             }
             return;
         }
+
         if (e.target === e.target.getStage()) {
             setSelectedImage(null);
         }
@@ -532,9 +534,9 @@ const PhotoEditor = ({
                                     strokeWidth={line.size}
                                 />
                             ))}
-                            {texts.map((text, i) => (
+                            {texts.map((text) => (
                                 <EditableText
-                                    key={i}
+                                    key={text.id}
                                     textProps={text}
                                     isSelected={text.id === selectedText}
                                     onChange={handleTextChange}

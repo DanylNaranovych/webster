@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Pagination } from 'react-bootstrap';
+import {
+    Container,
+    Row,
+    Col,
+    Card,
+    Button,
+    Modal,
+    Pagination,
+} from 'react-bootstrap';
 import styles from '../styles/ImageLibrary.module.css';
 import Header from './Header/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { getArtWorks } from '../store/actions/artWork';
+import { deleteArtWork, getArtWorks } from '../store/actions/artWork';
 
 const ImageLibrary = () => {
     const dispatch = useDispatch();
+    const [showModal, setShowModal] = useState(false);
+    const [currentId, setCurrentId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 8;
 
@@ -25,6 +35,12 @@ const ImageLibrary = () => {
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
+    };
+
+    const handleDelete = (event) => {
+        event.stopPropagation();
+        dispatch(deleteArtWork(currentId));
+        setShowModal(false);
     };
 
     return (
@@ -46,13 +62,16 @@ const ImageLibrary = () => {
                                 lg={3}
                                 className="mb-4"
                             >
-                                <Link to={`/${image.id}`}>
+                                <Link
+                                    to={`/${image.id}`}
+                                    style={{ textDecoration: 'none' }}
+                                >
                                     <Card className={styles.card}>
                                         <Card.Img
                                             variant="top"
                                             src={`http://127.0.0.1:8000//${photoUrl}`}
                                         />
-                                        <Card.Body>
+                                        <Card.Body className="d-flex flex-column">
                                             <Card.Title>
                                                 {image.name}
                                             </Card.Title>
@@ -60,6 +79,18 @@ const ImageLibrary = () => {
                                                 {image.description ||
                                                     'No description.'}
                                             </Card.Text>
+                                            <Button
+                                                variant="danger"
+                                                onClick={(event) => {
+                                                    event.preventDefault();
+                                                    event.stopPropagation();
+                                                    setCurrentId(image.id);
+                                                    setShowModal(true);
+                                                }}
+                                                className="align-self-end"
+                                            >
+                                                Delete
+                                            </Button>
                                         </Card.Body>
                                     </Card>
                                 </Link>
@@ -67,6 +98,31 @@ const ImageLibrary = () => {
                         );
                     })}
                 </Row>
+
+                <Modal
+                    show={showModal}
+                    onHide={() => setShowModal(false)}
+                    centered
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Confirm deletion</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Are you sure you want to delete this item? It will be
+                        deleted permanently.
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button variant="danger" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
 
                 <Pagination className={styles.paginationContainer}>
                     <Pagination.First

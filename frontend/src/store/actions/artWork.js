@@ -83,6 +83,16 @@ export const uploadArtWorkPhoto = (id, file) => async (dispatch) => {
     }
 };
 
+export const deleteArtWork = (id) => async (dispatch) => {
+    try {
+        await ArtWorkService.delete(id);
+        dispatch({ type: 'REMOVE_ARTWORK', payload: id });
+    } catch (error) {
+        dispatch({ type: 'SET_MESSAGE', payload: error.response.data.message });
+        console.error('Getting Artwork failed', error);
+    }
+};
+
 export const clearArtWork = () => async (dispatch) => {
     try {
         dispatch({ type: 'SET_ARTWORK', payload: null });
