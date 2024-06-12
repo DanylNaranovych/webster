@@ -76,12 +76,14 @@ class artworkController {
         res.sendStatus(200);
     }
 
-    deleteEventPhoto = async(req, res) =>  {
-        const eventId = Number(req.params.id);
+    async uploadArtworkPhoto (req, res) {
+        const artwork_id = req.params.id;
+        const user_id = req.user.id;
+        const file = req.files;
 
-        await artwork.update(eventId, "picture", "default_avatar.png");
+        await ArtworkService.uploadArtworkPhoto(file, user_id, artwork_id);
 
-        res.sendStatus(204);
+        res.sendStatus(200);
     }
 }
 

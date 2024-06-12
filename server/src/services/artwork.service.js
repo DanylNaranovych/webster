@@ -81,6 +81,25 @@ const ArtworkService = {
             content: metadata.content,
         });
     },
+
+    async uploadArtworkPhoto(file, user_id, artwork_id) {
+        const metadata = await this.read(artwork_id, user_id);
+
+        if (!file)
+            throw new ClientError('Please provide a valid file', 400);
+
+        const fileExtension = file.photo.name.split('.').pop();
+        const file_name = metadata.name + '_' + Date.now() + '.' + fileExtension;
+        const path = process.env.AVATARS_DIR + file_name;
+
+        await saveFile(path, file);
+
+        await deleteFile(metadata.photo);
+
+        await this.update(artwork_id, user_id, {
+            photo: path,
+        });
+    }
 };
 
 export default ArtworkService;

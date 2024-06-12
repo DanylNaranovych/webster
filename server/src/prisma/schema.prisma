@@ -27,6 +27,7 @@ model Artwork {
   authorId    String    @db.Uuid
   description String    @db.Text
   content     Json
+  photo       String    @db.VarChar(255) @default("artwork.png")
   createdAt   DateTime @default(now()) @db.Timestamp
 }
 
