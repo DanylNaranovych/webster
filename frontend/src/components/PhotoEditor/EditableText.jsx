@@ -13,6 +13,10 @@ const EditableText = ({ textProps, isSelected, onChange }) => {
         }
     }, [isSelected]);
 
+    useEffect(() => {
+        setText(textProps.text);
+    }, [textProps.text]);
+
     return (
         <>
             <Text

@@ -37,6 +37,8 @@ const PhotoEditor = ({
     onTextsChange,
     lines,
     setLines,
+    setHistory,
+    setEffectsValues,
 }) => {
     const containerRef = useRef(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -125,6 +127,15 @@ const PhotoEditor = ({
                         width: artWork.content.imageSize.width,
                         height: artWork.content.imageSize.height,
                     });
+                    setHistory([
+                        {
+                            effectsValues: artWork.content.effectsValues,
+                            lines: artWork.content.lines,
+                            texts: artWork.content.texts,
+                            figures: artWork.content.figures,
+                        },
+                    ]);
+                    setEffectsValues(artWork.content.effectsValues);
                     setLines(artWork.content.lines);
                     setTexts(artWork.content.texts);
                     setAnnotations(artWork.content.figures);
@@ -139,6 +150,8 @@ const PhotoEditor = ({
         setTexts,
         setLines,
         setAnnotations,
+        setEffectsValues,
+        setHistory,
     ]);
 
     useEffect(() => {
@@ -471,6 +484,7 @@ const PhotoEditor = ({
         const rects = texts.slice();
         const index = rects.findIndex((rect) => rect.id === newAttrs.id);
         rects[index] = newAttrs;
+        console.log(rects);
         onTextsChange(rects);
     };
 
@@ -540,6 +554,7 @@ const PhotoEditor = ({
                                     textProps={text}
                                     isSelected={text.id === selectedText}
                                     onChange={handleTextChange}
+                                // handleHistoryTextsSave={handleHistoryTextsSave}
                                 />
                             ))}
                             {annotationsToDraw.map((value) => (
