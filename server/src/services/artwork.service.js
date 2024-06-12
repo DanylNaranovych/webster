@@ -37,6 +37,7 @@ const ArtworkService = {
                 description: true,
                 authorId: true,
                 createdAt: true,
+                photo: true,
             },
         });
     },
