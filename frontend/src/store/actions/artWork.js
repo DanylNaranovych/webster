@@ -25,8 +25,6 @@ export const updateArtWork =
     (data, mainImageFile, projectImageFile, id) => async (dispatch) => {
         try {
             await ArtWorkService.update(data, id);
-            console.log(mainImageFile);
-            console.log(projectImageFile);
             dispatch(uploadArtWork(id, mainImageFile));
             dispatch(uploadArtWorkPhoto(id, projectImageFile));
             dispatch({

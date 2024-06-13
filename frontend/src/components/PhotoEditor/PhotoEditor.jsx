@@ -484,7 +484,6 @@ const PhotoEditor = ({
         const rects = texts.slice();
         const index = rects.findIndex((rect) => rect.id === newAttrs.id);
         rects[index] = newAttrs;
-        console.log(rects);
         onTextsChange(rects);
     };
 

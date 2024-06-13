@@ -111,8 +111,6 @@ const MainPage = () => {
         ];
         setHistory(newHistory);
         setHistoryStep(historyStep + 1);
-        console.log(history);
-        console.log(historyStep);
     };
 
     const addFiguresToHistory = (newFigures) => {
@@ -165,17 +163,14 @@ const MainPage = () => {
     }, []);
 
     const handleDeleteFigure = (id) => {
-        console.log(figures);
         handleFiguresSave(figures.filter((figure) => figure.key !== id));
-        console.log(figures);
     };
 
     const handleDeleteText = (textId) => {
-        console.log(texts);
         handleTextsSave((prevTexts) =>
             prevTexts.filter((textItem) => textItem.id !== textId),
         );
-        console.log(texts);
+
     };
 
     const handleUpdateText = (color, fontSize, selectedTextId) => {
@@ -225,7 +220,6 @@ const MainPage = () => {
 
         setTexts(newTexts);
         addTextsToHistory(newTexts);
-        console.log(history);
     };
 
     const handleFiguresSave = (newFigures) => {
