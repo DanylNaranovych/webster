@@ -129,12 +129,21 @@ const TextItemsList = ({
                                     </div>
                                     <Button
                                         variant="light"
-                                        className="mt-1"
+                                        className="mx-1"
                                         onClick={() =>
                                             handleChange(textItem.id)
                                         }
                                     >
                                         Change
+                                    </Button>
+                                    <Button
+                                        variant="light"
+                                        className="mx-1"
+                                        onClick={() =>
+                                            onDeleteText(textItem.id)
+                                        }
+                                    >
+                                        Delete
                                     </Button>
                                 </ListGroup.Item>
                             ))}

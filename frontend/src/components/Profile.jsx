@@ -1,13 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Container, Card, Button } from 'react-bootstrap';
 import Header from './Header/Header';
+import { logout } from '../store/actions/auth';
 import styles from '../styles/Profile.module.css';
 
 const Profile = () => {
-    const user = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        avatar: 'https://via.placeholder.com/150',
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const user = useSelector((state) => state.auth.user);
+
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate('/');
     };
 
     return (
@@ -17,12 +23,12 @@ const Profile = () => {
                 <Card className={styles.profileCard}>
                     <Card.Img
                         variant="top"
-                        src={user.avatar}
+                        src="https://innostudio.de/fileuploader/images/default-avatar.png"
                         className={styles.avatar}
                     />
                     <Card.Body>
                         <Card.Title className={styles.cardTitle}>
-                            {user.name}
+                            {user.login}
                         </Card.Title>
                         <Card.Text className={styles.cardText}>
                             {user.email}
@@ -35,6 +41,7 @@ const Profile = () => {
                                 Edit Profile
                             </Button>
                             <Button
+                                onClick={handleLogout}
                                 variant="outline-danger"
                                 className={styles.logoutButton}
                             >

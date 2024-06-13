@@ -11,6 +11,10 @@ export const serializeData = (
             height: imageSize.height,
         },
 
+        image: {
+            imageSrc: '',
+        },
+
         lines: lines.map((line) => ({
             points: line.points,
             color: line.color,

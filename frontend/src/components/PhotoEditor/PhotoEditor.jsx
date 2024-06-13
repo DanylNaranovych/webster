@@ -9,6 +9,7 @@ import ImageControls from './ImageControls';
 import AnnotationFigure from './AnnotationFigure';
 import styles from '../../styles/PhotoEditor.module.css';
 import Konva from 'konva';
+import { v4 as uuidv4 } from 'uuid';
 
 const PhotoEditor = ({
     onImageSizeChange,
@@ -19,6 +20,11 @@ const PhotoEditor = ({
     onSaveImage,
     onSaveLines,
     selectedTool,
+    imageSrc,
+    setImageSrc,
+    artWork,
+    image,
+    setImage,
     texts,
     setTexts,
     annotations,
@@ -27,10 +33,14 @@ const PhotoEditor = ({
     selectedText,
     effectsValues,
     brushType,
+    onFiguresChange,
+    onTextsChange,
+    lines,
+    setLines,
+    setHistory,
+    setEffectsValues,
 }) => {
-    const [imageSrc, setImageSrc] = useState(null);
     const containerRef = useRef(null);
-    const [image, setImage] = useState(null);
     const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
     const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
     const [selectedImage, setSelectedImage] = useState(null);
@@ -39,10 +49,8 @@ const PhotoEditor = ({
     const stageRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    const [lines, setLines] = useState([]);
 
     const [isDrawing, setIsDrawing] = useState(false);
-    // const [previousValues, setPreviousValues] = useState(effectsValues);
     const [newAnnotation, setNewAnnotation] = useState([]);
 
     const filters = [];
@@ -65,14 +73,17 @@ const PhotoEditor = ({
     useImagePaste(setImageSrc);
     useDeleteImage(selectedImage, handleDeleteImage);
 
-    const onDrop = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0];
-        const reader = new FileReader();
-        reader.onload = () => {
-            setImageSrc(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }, []);
+    const onDrop = useCallback(
+        (acceptedFiles) => {
+            const file = acceptedFiles[0];
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImageSrc(reader.result);
+            };
+            reader.readAsDataURL(file);
+        },
+        [setImageSrc],
+    );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -94,10 +105,6 @@ const PhotoEditor = ({
     }, [scale, onScaleChange]);
 
     useEffect(() => {
-        onSaveLines(lines);
-    }, [lines, onSaveLines]);
-
-    useEffect(() => {
         if (containerRef.current) {
             const { clientWidth, clientHeight } = containerRef.current;
             setStageSize({
@@ -111,12 +118,41 @@ const PhotoEditor = ({
         if (imageSrc) {
             const img = new window.Image();
             img.src = imageSrc;
+            img.crossOrigin = 'Anonymous';
             img.onload = () => {
                 setImage(img);
                 setImageSize({ width: img.width, height: img.height });
+                if (artWork) {
+                    setImageSize({
+                        width: artWork.content.imageSize.width,
+                        height: artWork.content.imageSize.height,
+                    });
+                    setHistory([
+                        {
+                            effectsValues: artWork.content.effectsValues,
+                            lines: artWork.content.lines,
+                            texts: artWork.content.texts,
+                            figures: artWork.content.figures,
+                        },
+                    ]);
+                    setEffectsValues(artWork.content.effectsValues);
+                    setLines(artWork.content.lines);
+                    setTexts(artWork.content.texts);
+                    setAnnotations(artWork.content.figures);
+                }
             };
         }
-    }, [imageSrc, stageSize]);
+    }, [
+        imageSrc,
+        setImage,
+        stageSize,
+        artWork,
+        setTexts,
+        setLines,
+        setAnnotations,
+        setEffectsValues,
+        setHistory,
+    ]);
 
     useEffect(() => {
         if (selectedImage && transformerRef.current) {
@@ -148,7 +184,6 @@ const PhotoEditor = ({
 
             imageRef.current.cache();
             imageRef.current.filters(filters);
-            // setPreviousValues(effectsValues);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectsValues]);
@@ -195,7 +230,8 @@ const PhotoEditor = ({
             const x = (pointerPosition.x - stagePos.x) / scale;
             const y = (pointerPosition.y - stagePos.y) / scale;
             if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                setLines([...lines, { points: [x, y], color, size }]);
+                onSaveLines([...lines, { points: [x, y], color, size }]);
+                // setLines([...lines, { points: [x, y], color, size }]);
             }
             return;
         }
@@ -232,7 +268,7 @@ const PhotoEditor = ({
         }
 
         if (selectedTool === 'text') {
-            const id = texts.length + 1;
+            const id = uuidv4();
             const stage = stageRef.current;
             const scale = stage.scaleX();
             const pointerPosition = stage.getPointerPosition();
@@ -255,10 +291,11 @@ const PhotoEditor = ({
                     draggable: true,
                     id: `text-${id}`,
                 };
-                setTexts([...texts, textProps]);
+                onTextsChange([...texts, textProps]);
             }
             return;
         }
+
         if (e.target === e.target.getStage()) {
             setSelectedImage(null);
         }
@@ -318,6 +355,7 @@ const PhotoEditor = ({
                         color: drawColor,
                         size: drawingSize,
                     };
+                    // onSaveLines([...lines, newLine]);
                     setLines([...lines, newLine]);
                 }
 
@@ -331,6 +369,10 @@ const PhotoEditor = ({
                         );
                         if (distance > 5) {
                             lastLine.points = lastLine.points.concat([x, y]);
+                            // onSaveLines([
+                            //     ...lines.slice(0, lines.length - 1),
+                            //     lastLine,
+                            // ]);
                             setLines([
                                 ...lines.slice(0, lines.length - 1),
                                 lastLine,
@@ -349,6 +391,10 @@ const PhotoEditor = ({
                         );
                         if (distance > 2) {
                             lastLine.points = lastLine.points.concat([x, y]);
+                            // onSaveLines([
+                            //     ...lines.slice(0, lines.length - 1),
+                            //     lastLine,
+                            // ]);
                             setLines([
                                 ...lines.slice(0, lines.length - 1),
                                 lastLine,
@@ -424,9 +470,13 @@ const PhotoEditor = ({
                 size: drawingSize,
                 tool: selectedTool,
             };
-            annotations.push(annotationToAdd);
+
+            setAnnotations((prevAnnotations) => {
+                const newAnnotations = [...prevAnnotations, annotationToAdd];
+                onFiguresChange(newAnnotations);
+                return newAnnotations;
+            });
             setNewAnnotation([]);
-            setAnnotations(annotations);
         }
     };
 
@@ -434,7 +484,8 @@ const PhotoEditor = ({
         const rects = texts.slice();
         const index = rects.findIndex((rect) => rect.id === newAttrs.id);
         rects[index] = newAttrs;
-        setTexts(rects);
+        console.log(rects);
+        onTextsChange(rects);
     };
 
     const annotationsToDraw = [...annotations, ...newAnnotation];
@@ -497,12 +548,13 @@ const PhotoEditor = ({
                                     strokeWidth={line.size}
                                 />
                             ))}
-                            {texts.map((text, i) => (
+                            {texts.map((text) => (
                                 <EditableText
-                                    key={i}
+                                    key={text.id}
                                     textProps={text}
                                     isSelected={text.id === selectedText}
                                     onChange={handleTextChange}
+                                // handleHistoryTextsSave={handleHistoryTextsSave}
                                 />
                             ))}
                             {annotationsToDraw.map((value) => (
