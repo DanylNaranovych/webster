@@ -1,0 +1,34 @@
+definitions:
+  login:
+    type: object
+    properties:
+      login:
+        type: string
+        required: true
+      password:
+        type: string
+        required: true
+  user_with_token:
+    type: object
+    properties:
+      id:
+        type: integer
+      accessToken:
+        type: string
+  token:
+    type: object
+    properties:
+      accessToken:
+        type: string
+  send_password_confirmation:
+    type: object
+    properties:
+      email:
+        type: string
+        required: true
+  reset_password:
+    type: object
+    properties:
+      password:
+        type: string
+        required: true

@@ -1,0 +1,261 @@
+paths:
+  /artwork:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Events
+      description: Get all artworks
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          description: The id of user
+      responses:
+        200:
+          description: All user artworks found
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        400:
+          description: The format of the data is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+    post:
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      description: Create an event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#definitions/event_create'
+      responses:
+        201:
+          description: Event was created
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        400:
+          description: The format of the data is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        401:
+          description: Bearer token is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        404:
+          description: The company was not found by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+  /artwork/{id}:
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+        description: The id of the record to query
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Events
+      description: Get the event by id
+      responses:
+        200:
+          description: Found the event by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        404:
+          description: The event was not found by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+    put:
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      description: Update the event by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#definitions/event_update'
+      responses:
+        201:
+          description: Event was updated
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        400:
+          description: The format of the data is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        401:
+          description: Bearer token is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        403:
+          description: You do not have proper rights
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        404:
+          description: The event was not found by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+    delete:
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      description: Remove the event by id
+      responses:
+        200:
+          description: Event was removed
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        401:
+          description: Bearer token is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        403:
+          description: You do not have proper rights
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        404:
+          description: The event was not found by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+  /artwork/{id}/object:
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+        description: The id of the record to query
+    post:
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      description: Update the artwork's object by id
+      parameters:
+        - in: formData
+          name: poster
+          type: file
+          required: true
+          description: The file to upload.
+      responses:
+        201:
+          description: The event's poster was updated
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/artwork'
+        400:
+          description: The format of the file is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        401:
+          description: Bearer token is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        403:
+          description: You do not have proper rights
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        404:
+          description: The event was not found by id
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+  /events/{id}/photo:
+    parameters:
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+        description: The id of the record to query
+    post:
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      description: Update artwork's photo by id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#definitions/artwork_checkout'
+      responses:
+        200:
+          description: Successfully updated photo
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  sessionId:
+                    type: integer
+        400:
+          description: You're already subscribed to the event
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        401:
+          description: Bearer token is invalid
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
+        403:
+          description: No tickets available
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#definitions/error'
