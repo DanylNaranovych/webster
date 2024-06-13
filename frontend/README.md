@@ -1,70 +1,75 @@
-# Getting Started with Create React App
+# Webster Frontend Docs
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Short Description
 
-## Available Scripts
+This project is a photo editor built using React and Redux. The application allows users to upload images, apply various filters and adjustments, and save the edited images. The editor provides a user-friendly interface with real-time preview and a range of customization options. The main goal is to offer an easy-to-use yet powerful tool for basic photo editing tasks.
 
-In the project directory, you can run:
+## Sccreenshots
 
-### `npm start`
+![Screenshot](https://i.ibb.co/pfK6YyQ/2024-06-13-15-46-42.png)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Requirements and Dependencies
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To build and run this project, you need to have the following installed on your machine:
 
-### `npm test`
+-   **Node.js**: Version 12.x or higher
+-   **npm**: Version 6.x or higher (comes with Node.js)
+-   **React**: ^17.0.0
+-   **Redux**: ^4.0.0
+-   **React-Redux**: ^7.0.0
+-   **Other dependencies**: Listed in `package.json`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Describe the steps from cloning your repository to the first launch
 
-### `npm run build`
+1. **Clone the repository:**
+   git clone https://github.com/DanylNaranovych/webster/tree/main/frontend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. **Navigate to the project directory:**
+   cd photo-editor
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. **Install dependencies:**
+   npm install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. **Start the development server:**
+   npm start
 
-### `npm run eject`
+5. **Open your browser:**
+   Navigate to 127.0.0.1:3000
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Full-Fledged Documentation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## The project follows a structured organization to maintain clarity and ease of navigation. Key directories include:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+-   src/components: Contains reusable React components for building the user interface.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+-   src/styles: Includes global styles and theme configurations for consistent styling across the application.
 
-## Learn More
+-   src/http: This directory contains modules and utilities related to handling HTTP requests. It typically includes files for API interaction, such as functions for sending requests (using libraries like Axios or Fetch), processing server responses, managing authentication, and intercepting errors. It may also house client request configurations and interceptor setups.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+-   src/services: In this directory, you'll find service layers or business logic. Files here handle tasks such as API interaction, data processing before passing it to components, state management, and executing business logic. Services may include methods for CRUD operations, data transformations, or integration with external services.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+-   src/store: The store directory is used for centralized state management, often with libraries like Redux or Vuex. It contains files related to state actions, reducers for updating state based on actions, selectors for accessing state data, and middleware for asynchronous logic like API calls or logging.
 
-### Code Splitting
+-   src/utils: This directory stores utility functions and helper modules that provide common functionalities throughout the application. Utilities may include functions for date formatting, string manipulation, validation helpers, or any other reusable functions used across different parts of the codebase.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+-   public: Contains static assets such as images and favicon.
 
-### Analyzing the Bundle Size
+## Progress After Each Completed CBL Stage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+-   Conceptualization: Defined the core features including image loading, editing tools, and exporting capabilities.
 
-### Making a Progressive Web App
+-   Design: Created a modular architecture allowing for easy integration of new features and enhancements. Designed the user interface for intuitive interaction.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+-   Implementation: Developed the image processing algorithms for color correction, filters, and retouching. Implemented the UI components and backend logic for seamless operation.
 
-### Advanced Configuration
+## Description of the Algorithm of the Whole Program
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The photo editor operates through the following key algorithms:
 
-### Deployment
+-   Image Loading: Handles loading images from various file formats while maintaining data integrity and quality.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+-   Editing Algorithms: Implement editing algorithms that enable resizing images while maintaining aspect ratios, drawing shapes, adding text using pencil and brush tools with adjustable sizes, modifying text and shape dimensions, changing colors, and moving elements within the image.
 
-### `npm run build` fails to minify
+-   Saving and Exporting: Allows users to save edited images in multiple formats (JPEG, PNG, TIFF) with customizable compression settings.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+-   User Interface Management: Manages the user interaction flow, providing intuitive controls for accessing editing tools and viewing real-time previews of changes.
